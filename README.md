@@ -1,5 +1,5 @@
 # Interference
-IPW estimators of causal effect estimands in the presence of interference
+## IPW estimators of causal effect estimands in the presence of interference
 
 The estimands  of Hudgens and Halloran describe average potential outcomes (in groups or population)
 under counterfactual treatment allocation that have a two-stage randomization design. In those
