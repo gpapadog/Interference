@@ -11,6 +11,7 @@ source('GetSimData_function.R')
 source('YpopTruePS_function.R')
 source('VarEstPS_function.R')
 source('CalcScore_function.R')
+source('CalcB11matrix_function.R')
 
 setwd('~/Documents/Interference/Simulations/')
 load_path <- 'Population_quantities/Data/Data3/'
@@ -86,7 +87,7 @@ ypop_true_var <- ypop$ypop_var
 
 phi_hat_est <- list(coefs = summary(glmod)$coef[, 1],
                     re_var = as.numeric(summary(glmod)$varcor))
-ygroup_est <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_true,
+ygroup_est <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_est,
                        gamma_numer = trt_coef, alpha = alpha, neigh_ind = neigh_ind,
                        keep_re_alpha = TRUE)$yhat_group
 
@@ -95,3 +96,10 @@ ypop_est <- ypop$ypop
 ypop_est_var <- VarEstPS(sim_dta, ygroup_est, ypop_est, neigh_ind, phi_hat_est,
                          cov_cols, ypop$ypop_var)
 
+
+par(mfrow = c(1, 2))
+plot(ypop_true, ypop_est)
+abline(a = 0, b = 1)
+
+plot(ypop_true_var, ypop_est_var)
+abline(a = 0, b = 1)
