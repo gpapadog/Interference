@@ -15,11 +15,12 @@ CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL) {
   n_neigh <- length(neigh_ind)
   num_gamma <- length(phi_hat$coefs) + 1
   phi_hat$coefs <- matrix(phi_hat$coefs, ncol = 1)
-  
+
   if (is.null(trt_name)) {
     trt_name <- 'A'
   }
   trt_col <- which(names(dta) == 'A')
+  mean_trt_prob <- mean(dta[, trt_col])
   
   scores <- matrix(NA, nrow = num_gamma, ncol = n_neigh)
   
@@ -36,21 +37,23 @@ CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL) {
         phi_hat_jj$coefs[jj, 1] <- gamma
         
         denom <- DenomIntegral(A = Ai, X = Xi, phi_hat = phi_hat_jj,
-                               alpha = curr_alpha)$value
+                               alpha = mean_trt_prob)$value
         return(log(denom))
       }
-      scores[nn, jj] <- grad(fn_deriv, phi_hat$coefs[jj])
+      scores[jj, nn] <- grad(fn_deriv, phi_hat$coefs[jj])
     }
 
     fn_deriv <- function(gamma) {
       phi_hat_var <- phi_hat
       phi_hat_var[[2]] <- gamma
       denom <- DenomIntegral(A = Ai, X = Xi, phi_hat = phi_hat_var,
-                             alpha = curr_alpha)$value
+                             alpha = mean_trt_prob)$value
       return(log(denom))
     }
-    scores[nn, num_gamma] <- grad(fn_deriv, phi_hat[[2]])
+    scores[num_gamma, nn] <- grad(fn_deriv, phi_hat[[2]])
 
+    scores[, nn] <- scores[, nn] * mean_trt_prob ^ sum(Ai)
+    scores[, nn] <- scores[, nn] * (1 - mean_trt_prob) ^ sum(Ai == 0)
   }
   return(scores)  
 }
