@@ -1,3 +1,7 @@
+#' Variance of the population average potential outcome for a correctly
+#' specified propensity score model.
+#' 
+#' @param 
 VarEstPS <- function(dta, ygroup, ypop, neigh_ind, phi_hat, cov_cols, var_true,
                      trt_name = NULL) {
  
@@ -6,13 +10,11 @@ VarEstPS <- function(dta, ygroup, ypop, neigh_ind, phi_hat, cov_cols, var_true,
   phi_hat$coefs <- matrix(phi_hat$coefs, ncol = 1)
   alpha <- as.numeric(dimnames(ygroup)[[3]])
   
+  # Calculating the score of the ps for every cluster.
   scores <- CalcScore(dta, neigh_ind, phi_hat, cov_cols, trt_name)
-  
-  A21 <- array(0, dim = c(2, num_gamma, length(alpha)))
-  B12 <- array(0, dim = c(num_gamma, 2, length(alpha)))
-  B11 <- matrix(0, nrow = num_gamma, ncol = num_gamma)
-  
+
   # --- Calculating B11, the information matrix of the cluster ps.
+  B11 <- matrix(0, nrow = num_gamma, ncol = num_gamma)
   for (nn in 1 : n_neigh) {
     scores_nn <- scores[, nn, drop = FALSE]
     B11 <- B11 + scores_nn %*% t(scores_nn)
@@ -20,12 +22,11 @@ VarEstPS <- function(dta, ygroup, ypop, neigh_ind, phi_hat, cov_cols, var_true,
   B11 <- B11 / n_neigh
   
   # ---- Calculating A21, B12.
+  A21 <- array(0, dim = c(2, num_gamma, length(alpha)))
+  B12 <- array(0, dim = c(num_gamma, 2, length(alpha)))
   for (aa in 1 : length(alpha)) {
-    print(paste0('alpha = ', alpha[aa]))
-
     for (nn in 1 : n_neigh) {
       scores_nn <- scores[, nn]
-
       for (it in c(1, 2)) {
         A21[it, , aa] <- A21[it, , aa] - ygroup[nn, it, aa] * scores_nn
         B12[, it, aa] <- B12[it, , aa] + scores_nn * (ygroup[nn, it, aa] - 
