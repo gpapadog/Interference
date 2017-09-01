@@ -52,7 +52,7 @@ CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL) {
     }
     scores[num_gamma, nn] <- grad(fn_deriv, phi_hat[[2]])
 
-    scores[, nn] <- scores[, nn] * mean_trt_prob ^ sum(Ai)
+    scores[, nn] <- scores[, nn] * mean_trt_prob ^ sum(Ai == 1)
     scores[, nn] <- scores[, nn] * (1 - mean_trt_prob) ^ sum(Ai == 0)
   }
   return(scores)  
