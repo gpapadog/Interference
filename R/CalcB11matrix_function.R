@@ -18,7 +18,7 @@ CalcB11matrix <- function(dta, neigh_ind, cov_cols, phi_hat) {
       
       likelihood <- GroupLikelihood(A = A, X = X, phi_hat = phi_hat_hess)$value
       
-      return(likelihood)
+      return(log(likelihood))
     }
     
     deriv <- grad(hess_function, x = c(phi_hat$coefs, phi_hat$re_var))
