@@ -4,6 +4,8 @@
 #' @param cov_cols The indeces including the covariates of the propensity score model.
 #' @param phi_hat A list with two elements. The first one is a vector of coefficients
 #' of the propensity score, and the second one is the random effect variance.
+#' @param gamma_numer The coefficients of the propensity score model in the numerator.
+#' If left NULL, the coefficients in phi_hat will be used instead.
 #' @param alpha The values of alpha for which we want to estimate the group average
 #' potential outcome.
 #' @param neigh_ind List. i^{th} element is a vector with the row indeces of dta that
@@ -18,9 +20,9 @@
 #' @param keep_re_alpha Logical. If set to TRUE the "random" effect that makes the
 #' average probability of treatment equal to alpha will be returned along with the
 #' estimated group average potential outcome.
-GroupIPW <- function(dta, cov_cols, phi_hat, alpha, neigh_ind = NULL, trt_col = NULL,
-                     out_col = NULL, lower = - 10, upper = 10, integral_bound = 10,
-                     keep_re_alpha = FALSE) {
+GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
+                     neigh_ind = NULL, trt_col = NULL, out_col = NULL, lower = - 10,
+                     upper = 10, integral_bound = 10, keep_re_alpha = FALSE) {
   
   integral_bound <- abs(integral_bound)
   
@@ -36,6 +38,9 @@ GroupIPW <- function(dta, cov_cols, phi_hat, alpha, neigh_ind = NULL, trt_col = 
   }
   if (!is.null(trt_col)) {
     names(dta)[out_col] <- 'Y'
+  }
+  if (is.null(gamma_numer)) {
+    gamma_numer <- matrix(phi_hat[[1]], ncol = 1)
   }
   
   # Specifyling neigh_ind will avoid re-running the following lines.
@@ -72,7 +77,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, alpha, neigh_ind = NULL, trt_col = 
             
             # For the observed values of the covariates.
             prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
-                                      coef_hat = phi_hat[[1]],
+                                      coef_hat = gamma_numer,
                                       alpha = curr_alpha,
                                       lower = lower, upper = upper)
             if (keep_re_alpha) {
