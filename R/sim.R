@@ -67,7 +67,8 @@ neigh_ind <- lapply(1 : n_neigh, function(nn) which(sim_dta$neigh == nn))
 # ---- Calculating the ipw, asymptotic variance.
 
 phi_hat_true <- list(coefs = trt_coef, re_var = re_sd ^ 2)
-ygroup_true <- GroupIPW(sim_dta, cov_cols, phi_hat_true, alpha, neigh_ind,
+ygroup_true <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_true,
+                        gamma_numer = NULL, alpha = alpha, neigh_ind = neigh_ind,
                         keep_re_alpha = TRUE)
 re_alpha_true <- ygroup_true$re_alpha
 ygroup_true <- ygroup_true$yhat_group
@@ -85,7 +86,9 @@ ypop_true_var <- ypop$ypop_var
 
 phi_hat_est <- list(coefs = summary(glmod)$coef[, 1],
                     re_var = as.numeric(summary(glmod)$varcor))
-ygroup_est <- GroupIPW(sim_dta, cov_cols, phi_hat_est, alpha, neigh_ind)$yhat_group
+ygroup_est <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_true,
+                       gamma_numer = trt_coef, alpha = alpha, neigh_ind = neigh_ind,
+                       keep_re_alpha = TRUE)$yhat_group
 
 ypop <- YpopTruePS(ygroup_est, alpha, use = 'pairwise.complete.obs')
 ypop_est <- ypop$ypop
