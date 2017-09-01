@@ -1,4 +1,4 @@
-#' @param dta The data set including (at least) the treatment and covaratiates.
+œ#' @param dta The data set including (at least) the treatment and covaratiates.
 #' @param neigh_ind A list including one element for each neighborhood. That
 #' element includes the indices of the observations in dta that belong to each
 #' neighborhood.
@@ -20,40 +20,26 @@ CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL) {
     trt_name <- 'A'
   }
   trt_col <- which(names(dta) == 'A')
-  mean_trt_prob <- mean(dta[, trt_col])
-  
+
   scores <- matrix(NA, nrow = num_gamma, ncol = n_neigh)
   
   for (nn in 1 : n_neigh) {
     
     Ai <- dta[neigh_ind[[nn]], trt_col]
     Xi <- dta[neigh_ind[[nn]], cov_cols]
-
-    for (jj in 1:(num_gamma - 1)) {  # For each PS coefficient.
+    
+    hess_function <- function(gamma) {
       
-      fn_deriv <- function(gamma) {
-        
-        phi_hat_jj <- phi_hat
-        phi_hat_jj$coefs[jj, 1] <- gamma
-        
-        denom <- DenomIntegral(A = Ai, X = Xi, phi_hat = phi_hat_jj,
-                               alpha = mean_trt_prob)$value
-        return(log(denom))
-      }
-      scores[jj, nn] <- grad(fn_deriv, phi_hat$coefs[jj])
+      phi_hat_hess <- NULL
+      phi_hat_hess$coefs <- gamma[- num_gamma]
+      phi_hat_hess$re_var <- gamma[num_gamma]
+      
+      likelihood <- DenomIntegral(Ai, Xi, phi_hat_hess, include_alpha = FALSE)
+      return(log(likelihood$value))
     }
+    
+    scores[, nn] <- grad(hess_function, x = c(phi_hat$coefs, phi_hat$re_var))
 
-    fn_deriv <- function(gamma) {
-      phi_hat_var <- phi_hat
-      phi_hat_var[[2]] <- gamma
-      denom <- DenomIntegral(A = Ai, X = Xi, phi_hat = phi_hat_var,
-                             alpha = mean_trt_prob)$value
-      return(log(denom))
-    }
-    scores[num_gamma, nn] <- grad(fn_deriv, phi_hat[[2]])
-
-    scores[, nn] <- scores[, nn] * mean_trt_prob ^ sum(Ai == 1)
-    scores[, nn] <- scores[, nn] * (1 - mean_trt_prob) ^ sum(Ai == 0)
   }
   return(scores)  
 }
