@@ -40,7 +40,7 @@ VarEstPS <- function(dta, ygroup, ypop, neigh_ind, phi_hat, cov_cols, var_true,
   var_est_ps <- array(NA, dim = c(2, 2, length(alpha)))
   dimnames(var_est_ps) <- list(it = c(0, 1), it = c(0, 1), alpha = alpha)
 
-  B11_inv <- solve(B11)
+  B11_inv <- chol2inv(chol(B11))
   for (aa in 1 : length(alpha)) {
     var_est_ps[, , aa] <- 
       A21[, , aa] %*% B11_inv %*% (t(A21[, , aa]) + B12[, , aa]) +
