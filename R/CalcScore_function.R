@@ -1,4 +1,4 @@
-œ#' @param dta The data set including (at least) the treatment and covaratiates.
+#' @param dta The data set including (at least) the treatment and covaratiates.
 #' @param neigh_ind A list including one element for each neighborhood. That
 #' element includes the indices of the observations in dta that belong to each
 #' neighborhood.
