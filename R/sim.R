@@ -1,17 +1,16 @@
 # --------------------
 # Change when running on the cluster.
-setwd('~/Github/Interference/R/')
-source('~/Documents/Functions/expit_function.R')
-source('DenomIntegral_function.R')
-source('CalcNumerator_function.R')
-source('FromAlphaToRE_function.R')
-source('GroupIPW_function.R')
-source('GroupLikelihood_function.R')
-source('GetSimData_function.R')
-source('YpopTruePS_function.R')
-source('VarEstPS_function.R')
-source('CalcScore_function.R')
-source('CalcB11matrix_function.R')
+source(paste0('~/Github/Interference/R/', '~/Documents/Functions/expit_function.R'))
+source(paste0('~/Github/Interference/R/', 'DenomIntegral_function.R'))
+source(paste0('~/Github/Interference/R/', 'CalcNumerator_function.R'))
+source(paste0('~/Github/Interference/R/', 'FromAlphaToRE_function.R'))
+source(paste0('~/Github/Interference/R/', 'GroupIPW_function.R'))
+source(paste0('~/Github/Interference/R/', 'GroupLikelihood_function.R'))
+source(paste0('~/Github/Interference/R/', 'GetSimData_function.R'))
+source(paste0('~/Github/Interference/R/', 'YpopTruePS_function.R'))
+source(paste0('~/Github/Interference/R/', 'VarEstPS_function.R'))
+source(paste0('~/Github/Interference/R/', 'CalcScore_function.R'))
+source(paste0('~/Github/Interference/R/', 'CalcB11matrix_function.R'))
 
 setwd('~/Documents/Interference/Simulations/')
 load_path <- 'Population_quantities/Data/Data3/'
@@ -93,8 +92,10 @@ ygroup_est <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_est
 
 ypop <- YpopTruePS(ygroup_est, alpha, use = 'pairwise.complete.obs')
 ypop_est <- ypop$ypop
-ypop_est_var <- VarEstPS(sim_dta, ygroup_est, ypop_est, neigh_ind, phi_hat_est,
-                         cov_cols, ypop$ypop_var)
+ypop_est_var <- VarEstPS(dta = sim_dta, ygroup = ygroup_est,
+                         var_true = ypop$ypop_var, ypop = ypop_est,
+                         neigh_ind = neigh_ind, phi_hat = phi_hat_est,
+                         cov_cols = cov_cols)
 
 
 par(mfrow = c(1, 2))
