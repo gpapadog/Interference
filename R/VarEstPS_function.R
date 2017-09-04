@@ -24,9 +24,9 @@ VarEstPS <- function(dta, ygroup, ypop, neigh_ind, phi_hat, cov_cols, var_true,
   # ---- Calculating A21, B12.
   A21 <- array(0, dim = c(2, num_gamma, length(alpha)))
   B12 <- array(0, dim = c(num_gamma, 2, length(alpha)))
-  for (aa in 1 : length(alpha)) {
-    for (nn in 1 : n_neigh) {
-      scores_nn <- scores[, nn]
+  for (nn in 1 : n_neigh) {
+    scores_nn <- scores[, nn]
+    for (aa in 1 : length(alpha)) {
       for (it in c(1, 2)) {
         A21[it, , aa] <- A21[it, , aa] - ygroup[nn, it, aa] * scores_nn
         B12[, it, aa] <- B12[it, , aa] + scores_nn * (ygroup[nn, it, aa] - 
