@@ -43,7 +43,8 @@ VarEstPS <- function(dta, ygroup, ypop, neigh_ind, phi_hat, cov_cols, var_true,
   B11_inv <- chol2inv(chol(B11))
   for (aa in 1 : length(alpha)) {
     var_est_ps[, , aa] <- 
-      A21[, , aa] %*% B11_inv %*% (t(A21[, , aa]) + B12[, , aa]) +
+      A21[, , aa] %*% B11_inv %*% t(A21[, , aa]) +
+      A21[, , aa] %*% B11_inv %*% B12[, , aa] +
       t(B12[, , aa]) %*% B11_inv %*% t(A21[, , aa])
     var_est_ps[, , aa] <- var_est_ps[, , aa] / n_neigh
     var_est_ps[, , aa] <- var_true[, , aa] + var_est_ps[, , aa]
