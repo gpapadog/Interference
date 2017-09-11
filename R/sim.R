@@ -1,12 +1,10 @@
 # --------------------
 # Change when running on the cluster.
 source_path <- '~/Github/Interference/R/'
-source(paste0(source_path, '~/Documents/Functions/expit_function.R'))
 source(paste0(source_path, 'DenomIntegral_function.R'))
 source(paste0(source_path, 'CalcNumerator_function.R'))
 source(paste0(source_path, 'FromAlphaToRE_function.R'))
 source(paste0(source_path, 'GroupIPW_function.R'))
-source(paste0(source_path, 'GroupLikelihood_function.R'))
 source(paste0(source_path, 'GetSimData_function.R'))
 source(paste0(source_path, 'YpopTruePS_function.R'))
 source(paste0(source_path, 'VarEstPS_function.R'))
@@ -14,7 +12,7 @@ source(paste0(source_path, 'CalcScore_function.R'))
 source('~/Documents/Functions/expit_function.R')
 
 setwd('~/Documents/Interference/Simulations/')
-load_path <- 'Population_quantities/Data/Data3/'
+load_path <- 'Population_quantities/Data/Data5/'
 out_path <- NULL
 library(lme4)
 library(numDeriv)

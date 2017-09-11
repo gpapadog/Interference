@@ -9,7 +9,8 @@
 #' model.
 #' @param trt_name The name of the treatment column. If it is 'A', you can
 #' leave NULL.
-CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL) {
+CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL,
+                      integral_bound = 10) {
   
   dta <- as.data.frame(dta)
   n_neigh <- length(neigh_ind)
@@ -34,7 +35,8 @@ CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL) {
       phi_hat_hess$coefs <- gamma[- num_gamma]
       phi_hat_hess$re_var <- gamma[num_gamma]
       
-      likelihood <- DenomIntegral(Ai, Xi, phi_hat_hess, include_alpha = FALSE)
+      likelihood <- DenomIntegral(Ai, Xi, phi_hat_hess, include_alpha = FALSE,
+                                  integral_bound = integral_bound)
       return(log(likelihood$value))
     }
     
