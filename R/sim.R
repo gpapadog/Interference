@@ -1,16 +1,17 @@
 # --------------------
 # Change when running on the cluster.
-source(paste0('~/Github/Interference/R/', '~/Documents/Functions/expit_function.R'))
-source(paste0('~/Github/Interference/R/', 'DenomIntegral_function.R'))
-source(paste0('~/Github/Interference/R/', 'CalcNumerator_function.R'))
-source(paste0('~/Github/Interference/R/', 'FromAlphaToRE_function.R'))
-source(paste0('~/Github/Interference/R/', 'GroupIPW_function.R'))
-source(paste0('~/Github/Interference/R/', 'GroupLikelihood_function.R'))
-source(paste0('~/Github/Interference/R/', 'GetSimData_function.R'))
-source(paste0('~/Github/Interference/R/', 'YpopTruePS_function.R'))
-source(paste0('~/Github/Interference/R/', 'VarEstPS_function.R'))
-source(paste0('~/Github/Interference/R/', 'CalcScore_function.R'))
-source(paste0('~/Github/Interference/R/', 'CalcB11matrix_function.R'))
+source_path <- '~/Github/Interference/R/'
+source(paste0(source_path, '~/Documents/Functions/expit_function.R'))
+source(paste0(source_path, 'DenomIntegral_function.R'))
+source(paste0(source_path, 'CalcNumerator_function.R'))
+source(paste0(source_path, 'FromAlphaToRE_function.R'))
+source(paste0(source_path, 'GroupIPW_function.R'))
+source(paste0(source_path, 'GroupLikelihood_function.R'))
+source(paste0(source_path, 'GetSimData_function.R'))
+source(paste0(source_path, 'YpopTruePS_function.R'))
+source(paste0(source_path, 'VarEstPS_function.R'))
+source(paste0(source_path, 'CalcScore_function.R'))
+source('~/Documents/Functions/expit_function.R')
 
 setwd('~/Documents/Interference/Simulations/')
 load_path <- 'Population_quantities/Data/Data3/'
@@ -92,10 +93,12 @@ ygroup_est <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_est
 
 ypop <- YpopTruePS(ygroup_est, alpha, use = 'pairwise.complete.obs')
 ypop_est <- ypop$ypop
+
+scores <- CalcScore(sim_dta, neigh_ind, phi_hat_est, cov_cols)
 ypop_est_var <- VarEstPS(dta = sim_dta, ygroup = ygroup_est,
                          var_true = ypop$ypop_var, ypop = ypop_est,
                          neigh_ind = neigh_ind, phi_hat = phi_hat_est,
-                         cov_cols = cov_cols)
+                         cov_cols = cov_cols, scores = scores)
 
 
 par(mfrow = c(1, 2))
@@ -104,3 +107,4 @@ abline(a = 0, b = 1)
 
 plot(ypop_true_var, ypop_est_var)
 abline(a = 0, b = 1)
+
