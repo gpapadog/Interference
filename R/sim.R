@@ -1,20 +1,18 @@
 # --------------------
 # Change when running on the cluster.
-setwd('~/Github/Interference/R/')
+source_path <- '~/Github/Interference/R/'
+source(paste0(source_path, 'DenomIntegral_function.R'))
+source(paste0(source_path, 'CalcNumerator_function.R'))
+source(paste0(source_path, 'FromAlphaToRE_function.R'))
+source(paste0(source_path, 'GroupIPW_function.R'))
+source(paste0(source_path, 'GetSimData_function.R'))
+source(paste0(source_path, 'YpopTruePS_function.R'))
+source(paste0(source_path, 'VarEstPS_function.R'))
+source(paste0(source_path, 'CalcScore_function.R'))
 source('~/Documents/Functions/expit_function.R')
-source('DenomIntegral_function.R')
-source('CalcNumerator_function.R')
-source('FromAlphaToRE_function.R')
-source('GroupIPW_function.R')
-source('GroupLikelihood_function.R')
-source('GetSimData_function.R')
-source('YpopTruePS_function.R')
-source('VarEstPS_function.R')
-source('CalcScore_function.R')
-source('CalcB11matrix_function.R')
 
 setwd('~/Documents/Interference/Simulations/')
-load_path <- 'Population_quantities/Data/Data3/'
+load_path <- 'Population_quantities/Data/Data5/'
 out_path <- NULL
 library(lme4)
 library(numDeriv)
@@ -23,7 +21,7 @@ library(numDeriv)
 
 # --------------------
 #  Estimation - alpha.
-alpha <- seq(0.2, 0.8, by = 0.05)
+alpha <- seq(0.2, 0.8, by = 0.1)
 a <- c(0, 1)
 lower <- - 10
 upper <- 10
@@ -93,8 +91,12 @@ ygroup_est <- GroupIPW(dta = sim_dta, cov_cols = cov_cols, phi_hat = phi_hat_est
 
 ypop <- YpopTruePS(ygroup_est, alpha, use = 'pairwise.complete.obs')
 ypop_est <- ypop$ypop
-ypop_est_var <- VarEstPS(sim_dta, ygroup_est, ypop_est, neigh_ind, phi_hat_est,
-                         cov_cols, ypop$ypop_var)
+
+scores <- CalcScore(sim_dta, neigh_ind, phi_hat_est, cov_cols)
+ypop_est_var <- VarEstPS(dta = sim_dta, yhat_group = ygroup_est,
+                         var_true = ypop$ypop_var, yhat_pop = ypop_est,
+                         neigh_ind = neigh_ind, phi_hat = phi_hat_est,
+                         cov_cols = cov_cols, scores = scores)
 
 
 par(mfrow = c(1, 2))
@@ -103,3 +105,4 @@ abline(a = 0, b = 1)
 
 plot(ypop_true_var, ypop_est_var)
 abline(a = 0, b = 1)
+
