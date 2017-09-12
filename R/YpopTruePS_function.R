@@ -1,3 +1,4 @@
+#' @export
 YpopTruePS <- function(ygroup, alpha, use = 'pairwise.complete.obs') {
   
   ypop <- apply(ygroup, c(2, 3), mean, na.rm = TRUE)

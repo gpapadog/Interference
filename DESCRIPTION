@@ -1,0 +1,22 @@
+Package: Interference
+Type: Package
+Title: Causal inference with interference for realistic regimes
+Version: 0.0.0.9000
+Date: 2016-11-16
+Author: Georgia Papadogeorgou
+Maintainer: Georgia Papadogeorgou <gpapadogeorgou@gmail.com>
+Description: FILL
+License: GPL (>= 2)
+LazyData: TRUE
+URL: https://github.com/gpapadog/Interference
+BugReports: https://github.com/gpapadog/Interference/issues
+RoxygenNote: 6.0.1
+Suggests: 
+    knitr,
+    lme4,
+    rmarkdown,
+    truncnorm
+VignetteBuilder: knitr
+Imports: 
+    data.table,
+    numDeriv

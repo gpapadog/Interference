@@ -20,6 +20,8 @@
 #' @param keep_re_alpha Logical. If set to TRUE the "random" effect that makes the
 #' average probability of treatment equal to alpha will be returned along with the
 #' estimated group average potential outcome.
+#' 
+#' @export
 GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
                      neigh_ind = NULL, trt_col = NULL, out_col = NULL, lower = - 10,
                      upper = 10, integral_bound = 10, keep_re_alpha = FALSE) {

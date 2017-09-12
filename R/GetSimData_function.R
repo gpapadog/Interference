@@ -9,6 +9,8 @@
 #' propensity score model.
 #' @param trt_coef Coefficients of the propensity score model corresponding to the
 #' intercept, and the two covariates in dta.
+#' 
+#' @export
 GetSimData <- function(dta, pot_out, neigh_ind, re_sd, trt_coef) {
   
   n_obs <- nrow(dta)

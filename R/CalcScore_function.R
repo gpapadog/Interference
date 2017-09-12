@@ -9,6 +9,8 @@
 #' model.
 #' @param trt_name The name of the treatment column. If it is 'A', you can
 #' leave NULL.
+#' 
+#' @export
 CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL,
                       integral_bound = 10) {
   
