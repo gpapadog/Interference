@@ -21,7 +21,7 @@ library(numDeriv)
 
 # --------------------
 #  Estimation - alpha.
-alpha <- seq(0.2, 0.8, by = 0.05)
+alpha <- seq(0.2, 0.8, by = 0.1)
 a <- c(0, 1)
 lower <- - 10
 upper <- 10
@@ -93,8 +93,8 @@ ypop <- YpopTruePS(ygroup_est, alpha, use = 'pairwise.complete.obs')
 ypop_est <- ypop$ypop
 
 scores <- CalcScore(sim_dta, neigh_ind, phi_hat_est, cov_cols)
-ypop_est_var <- VarEstPS(dta = sim_dta, ygroup = ygroup_est,
-                         var_true = ypop$ypop_var, ypop = ypop_est,
+ypop_est_var <- VarEstPS(dta = sim_dta, yhat_group = ygroup_est,
+                         var_true = ypop$ypop_var, yhat_pop = ypop_est,
                          neigh_ind = neigh_ind, phi_hat = phi_hat_est,
                          cov_cols = cov_cols, scores = scores)
 
