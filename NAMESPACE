@@ -2,7 +2,10 @@
 
 export(CalcNumerator)
 export(CalcScore)
+export(DE)
 export(GetSimData)
 export(GroupIPW)
+export(IE)
+export(IEvar)
 export(VarEstPS)
 export(YpopTruePS)

@@ -5,8 +5,8 @@
 \title{Function that estimates the group average potential outcome using IPW.}
 \usage{
 GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
-  neigh_ind = NULL, trt_col = NULL, out_col = NULL, lower = -10,
-  upper = 10, integral_bound = 10, keep_re_alpha = FALSE)
+  neigh_ind = NULL, trt_col = NULL, out_col = NULL, alpha_re_bound = 10,
+  integral_bound = 10, keep_re_alpha = FALSE)
 }
 \arguments{
 \item{dta}{The dataset as a data frame including treatment, outcome and covariates.}
@@ -30,9 +30,8 @@ column index.}
 
 \item{out_col}{If the outcome is not named 'Y', specify the outcome column index.}
 
-\item{lower}{The lower end of the values for bi we will look at. Defaults to - 10.}
-
-\item{upper}{The upper end of the values for bi we will look at. Defaults to 10.}
+\item{alpha_re_bound}{The lower and upper end of the values for bi we will
+look at. Defaults to 10, meaning we will look between - 10 and 10.}
 
 \item{integral_bound}{The number of standard deviations of the random effect that
 will be used as the lower and upper limit.}

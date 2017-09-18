@@ -13,8 +13,8 @@
 #' @param trt_col If the treatment is not named 'A' in dta, specify the treatment
 #' column index.
 #' @param out_col If the outcome is not named 'Y', specify the outcome column index.
-#' @param lower The lower end of the values for bi we will look at. Defaults to - 10.
-#' @param upper The upper end of the values for bi we will look at. Defaults to 10.
+#' @param alpha_re_bound The lower and upper end of the values for bi we will
+#' look at. Defaults to 10, meaning we will look between - 10 and 10.
 #' @param integral_bound The number of standard deviations of the random effect that
 #' will be used as the lower and upper limit.
 #' @param keep_re_alpha Logical. If set to TRUE the "random" effect that makes the
@@ -23,10 +23,12 @@
 #' 
 #' @export
 GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
-                     neigh_ind = NULL, trt_col = NULL, out_col = NULL, lower = - 10,
-                     upper = 10, integral_bound = 10, keep_re_alpha = FALSE) {
+                     neigh_ind = NULL, trt_col = NULL, out_col = NULL, 
+                     alpha_re_bound = 10, integral_bound = 10,
+                     keep_re_alpha = FALSE) {
   
   integral_bound <- abs(integral_bound)
+  alpha_re_bound <- abs(alpha_re_bound)
   
   dta <- as.data.frame(dta)
   n_neigh <- length(neigh_ind)
@@ -60,7 +62,8 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
     })
   }
   
-  for (aa in 1:length(alpha)) {
+  for (aa in 1 : length(alpha)) {
+    print(paste('alpha =', alpha[aa]))
     curr_alpha <- alpha[[aa]]
 
     for (it in c(0, 1)) {
@@ -81,7 +84,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
             prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
                                       coef_hat = gamma_numer,
                                       alpha = curr_alpha,
-                                      lower = lower, upper = upper)
+                                      alpha_re_bound = alpha_re_bound)
             if (keep_re_alpha) {
               obs <- which(neigh_ind[[nn]] == ind)
               re_alphas[[nn]][obs, curr_it + 1, aa] <- prob_ind$re_alpha
