@@ -9,14 +9,19 @@
 #' propensity score model.
 #' @param trt_coef Coefficients of the propensity score model corresponding to the
 #' intercept, and the two covariates in dta.
+#' 
+#' @export
 GetSimData <- function(dta, pot_out, neigh_ind, re_sd, trt_coef) {
   
   n_obs <- nrow(dta)
   n_neigh <- length(unique(dta$neigh))
+  num_cov <- length(trt_coef) - 1
+  cov_cols <- which(names(dta) %in% paste0('X', 1 : num_cov))
   
   # Generating the treatment indicators.
   re <- rnorm(n_neigh, mean = 0, sd = re_sd)
-  probs <- expit(cbind(1, dta$X1, dta$X2) %*% trt_coef + re[dta$neigh])
+  des_mat <- as.matrix(cbind(1, dta[, cov_cols]))
+  probs <- expit(des_mat %*% trt_coef + re[dta$neigh])
   print(paste('Range of treatment probability:',
               paste(round(range(probs), 3), collapse = '-')))
   A <- rbinom(n_obs, 1, prob = probs)

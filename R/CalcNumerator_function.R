@@ -6,23 +6,15 @@
 #' can be the observed values or a counterfactual set of covariates.
 #' @param coef_hat A vector of the ps coefficients starting with the intercept.
 #' @param alpha The average probability of treatment among the n_i - 1 units.
-#' @param lower The lower end of the values for bi we will look at. Defaults to - 10.
-#' @param upper The upper end of the values for bi we will look at. Defaults to 10.
 #' @param re_alpha The fixed effect bi that gives average propensity of treatment in
-#' the group equal to alpha. If set to NULL, it will be calculated.
+#' the group equal to alpha.
 #' 
 #' @export
-CalcNumerator <- function(Ai_j, Xi_j, coef_hat, alpha, lower = - 10, upper = 10,
-                          re_alpha = NULL) {
+CalcNumerator <- function(Ai_j, Xi_j, coef_hat, alpha, re_alpha) {
   
   coef_hat <- matrix(coef_hat, nrow = length(coef_hat), ncol = 1)
-  lin_pred <- cbind(1, as.matrix(Xi_j)) %*% coef_hat
   
-  # NOTE: re_alpha does NOT include the individual treatment.
-  if (is.null(re_alpha)) {
-    re_alpha <- FromAlphaToRE(alpha = alpha, lin_pred = lin_pred, lower = lower,
-                              upper = upper)
-  }
+  lin_pred <- cbind(1, as.matrix(Xi_j)) %*% coef_hat
   lin_pred <- lin_pred + re_alpha
   probs <- expit(lin_pred)
   

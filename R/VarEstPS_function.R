@@ -1,7 +1,7 @@
 #' Variance of the population average potential outcome for a correctly
 #' specified propensity score model.
 #' 
-#' @param 
+#' @export
 VarEstPS <- function(dta, yhat_group, yhat_pop, neigh_ind, phi_hat, cov_cols,
                      var_true = NULL, trt_name = NULL, scores = NULL) {
  

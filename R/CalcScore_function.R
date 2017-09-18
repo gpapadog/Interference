@@ -9,6 +9,8 @@
 #' model.
 #' @param trt_name The name of the treatment column. If it is 'A', you can
 #' leave NULL.
+#' 
+#' @export
 CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL,
                       integral_bound = 10) {
   
@@ -40,7 +42,7 @@ CalcScore <- function(dta, neigh_ind, phi_hat, cov_cols, trt_name = NULL,
       return(log(likelihood$value))
     }
     
-    scores[, nn] <- grad(hess_function, x = c(phi_hat$coefs, phi_hat$re_var))
+    scores[, nn] <- numDeriv::grad(hess_function, x = c(phi_hat$coefs, phi_hat$re_var))
 
   }
   return(scores)  

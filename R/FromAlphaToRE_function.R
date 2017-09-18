@@ -1,16 +1,20 @@
-#' Function that calculates the random effect that corresponds to a specific average
-#' probability of treatment.
+#' Function that calculates the random effect that corresponds to a specific
+#' average probability of treatment.
 #' 
-#' @param alpha Target average probability of treatment. Numberic between 0 and 1.
+#' @param alpha Target average probability of treatment. Numberic in 0 - 1.
 #' @param lin_pred Linear predictor for the probability of treatment among the
 #' remaining units. Includes intercept and fixed effects.
-#' @param lower The lower end of the values for bi we will look at. Defaults to - 10.
-#' @param upper The upper end of the values for bi we will look at. Defaults to 10.
-FromAlphaToRE <- function(alpha, lin_pred, lower = - 10, upper = 10) {
-  r <- optimise(f = AlphaToBi, lower = lower, upper = upper, alpha = alpha,
-                lin_pred = lin_pred)$minimum
-  if (abs(lower - r) < 0.1 | abs(upper - r) < 0.1) {
-    warning(paste('bi = ', r, ', lower = ', lower, ', upper = ', upper))
+#' @param alpha_re_bound The lower and upper end of the values for bi we will
+#' look at. Defaults to 10, meaning we will look between - 10 and 10.
+FromAlphaToRE <- function(alpha, lin_pred, alpha_re_bound = 10) {
+  
+  alpha_re_bound <- abs(alpha_re_bound)
+
+  r <- optimise(f = AlphaToBi, lower = - 1 * alpha_re_bound,
+                upper = alpha_re_bound, alpha = alpha, lin_pred = lin_pred)
+  r <- r$minimum
+  if (alpha_re_bound - abs(r) < 0.1) {
+    warning(paste0('bi = ', r, ', alpha_re_bound = ', alpha_re_bound))
   }
   return(r)
 }
@@ -21,6 +25,3 @@ AlphaToBi <- function(b, alpha, lin_pred) {
   return(r)
 }
 
-
-# QUESTION: Does it make sense to consider the average probability of treatment where
-# the treatment of the unit we are considered is fixed to whatever we are considering?
