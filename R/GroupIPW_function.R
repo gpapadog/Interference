@@ -1,25 +1,26 @@
 #' Function that estimates the group average potential outcome using IPW.
 #'
-#' @param dta The dataset as a data frame including treatment, outcome and covariates.
-#' @param cov_cols The indeces including the covariates of the propensity score model.
-#' @param phi_hat A list with two elements. The first one is a vector of coefficients
-#' of the propensity score, and the second one is the random effect variance.
-#' @param gamma_numer The coefficients of the propensity score model in the numerator.
+#' @param dta Data frame including treatment, outcome and covariates.
+#' @param cov_cols The indices including the covariates of the ps model.
+#' @param phi_hat A list with two elements. The first one is a vector of
+#' coefficients of the ps, and the second one is the random effect variance.
+#' @param gamma_numer The coefficients of the ps model in the numerator.
 #' If left NULL, the coefficients in phi_hat will be used instead.
-#' @param alpha The values of alpha for which we want to estimate the group average
-#' potential outcome.
-#' @param neigh_ind List. i^{th} element is a vector with the row indeces of dta that
-#' are in cluster i. Can be left NULL.
-#' @param trt_col If the treatment is not named 'A' in dta, specify the treatment
-#' column index.
-#' @param out_col If the outcome is not named 'Y', specify the outcome column index.
+#' @param alpha The values of alpha for which we want to estimate the group
+#' average potential outcome.
+#' @param neigh_ind List. i^{th} element is a vector with the row indices of
+#' dta that are in cluster i. Can be left NULL.
+#' @param trt_col If the treatment is not named 'A' in dta, specify the
+#' treatment column index.
+#' @param out_col If the outcome is not named 'Y', specify the outcome column
+#' index.
 #' @param alpha_re_bound The lower and upper end of the values for bi we will
 #' look at. Defaults to 10, meaning we will look between - 10 and 10.
-#' @param integral_bound The number of standard deviations of the random effect that
-#' will be used as the lower and upper limit.
-#' @param keep_re_alpha Logical. If set to TRUE the "random" effect that makes the
-#' average probability of treatment equal to alpha will be returned along with the
-#' estimated group average potential outcome.
+#' @param integral_bound The number of standard deviations of the random effect
+#' that will be used as the lower and upper limit.
+#' @param keep_re_alpha Logical. If set to TRUE the "random" effect that makes
+#' the average probability of treatment equal to alpha will be returned along
+#' with the estimated group average potential outcome.
 #' 
 #' @export
 GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
@@ -29,6 +30,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   
   integral_bound <- abs(integral_bound)
   alpha_re_bound <- abs(alpha_re_bound)
+  phi_hat[[1]] <- matrix(phi_hat[[1]], ncol = 1)
   
   dta <- as.data.frame(dta)
   n_neigh <- length(neigh_ind)
@@ -55,22 +57,27 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   }
   
   if (keep_re_alpha) {
-    re_alphas <- lapply(1 : n_neigh, function(nn) {
-      A <- array(NA, dim = c(length(neigh_ind[[nn]]), 2, length(alpha)))
-      dimnames(A) <- list(unit = 1:(dim(A)[1]), a = c(0, 1), alpha = alpha)
-      return(A)
-    })
+    re_alphas <- matrix(NA, nrow = n_neigh, ncol = length(alpha))
+    dimnames(re_alphas) <- list(neigh = 1 : n_neigh, alpha = alpha)
   }
   
   for (aa in 1 : length(alpha)) {
     print(paste('alpha =', alpha[aa]))
     curr_alpha <- alpha[[aa]]
+    
+    for (nn in 1 : n_neigh) {
+      
+      # Calculating the random effect that gives alpha.
+      Xi <- dta[neigh_ind[[nn]], cov_cols]
+      lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
+      re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
+                                alpha_re_bound = alpha_re_bound)
+      re_alphas[nn, aa] <- re_alpha
 
-    for (it in c(0, 1)) {
-      curr_it <- it
-      bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
-
-      for (nn in 1:n_neigh) {
+      for (it in c(0, 1)) {
+        curr_it <- it
+        bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
+        
         # If no individuals have treatement it we cannot estimate the group average.
         y_curr <- ifelse(sum(dta$A[neigh_ind[[nn]]] == curr_it) == 0, NA, 0)
         for (ind in neigh_ind[[nn]]) {
@@ -80,16 +87,9 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
             Ai_j <- dta$A[wh_others]
             Xi_j <- dta[wh_others, cov_cols]
             
-            # For the observed values of the covariates.
             prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
                                       coef_hat = gamma_numer,
-                                      alpha = curr_alpha,
-                                      alpha_re_bound = alpha_re_bound)
-            if (keep_re_alpha) {
-              obs <- which(neigh_ind[[nn]] == ind)
-              re_alphas[[nn]][obs, curr_it + 1, aa] <- prob_ind$re_alpha
-            }
-            
+                                      alpha = curr_alpha, re_alpha = re_alpha)
             y_curr <- y_curr + dta$Y[ind] * prob_ind$prob
           }
         }

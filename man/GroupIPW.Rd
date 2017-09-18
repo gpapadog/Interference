@@ -9,36 +9,37 @@ GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   integral_bound = 10, keep_re_alpha = FALSE)
 }
 \arguments{
-\item{dta}{The dataset as a data frame including treatment, outcome and covariates.}
+\item{dta}{Data frame including treatment, outcome and covariates.}
 
-\item{cov_cols}{The indeces including the covariates of the propensity score model.}
+\item{cov_cols}{The indices including the covariates of the ps model.}
 
-\item{phi_hat}{A list with two elements. The first one is a vector of coefficients
-of the propensity score, and the second one is the random effect variance.}
+\item{phi_hat}{A list with two elements. The first one is a vector of
+coefficients of the ps, and the second one is the random effect variance.}
 
-\item{gamma_numer}{The coefficients of the propensity score model in the numerator.
+\item{gamma_numer}{The coefficients of the ps model in the numerator.
 If left NULL, the coefficients in phi_hat will be used instead.}
 
-\item{alpha}{The values of alpha for which we want to estimate the group average
-potential outcome.}
+\item{alpha}{The values of alpha for which we want to estimate the group
+average potential outcome.}
 
-\item{neigh_ind}{List. i^{th} element is a vector with the row indeces of dta that
-are in cluster i. Can be left NULL.}
+\item{neigh_ind}{List. i^{th} element is a vector with the row indices of
+dta that are in cluster i. Can be left NULL.}
 
-\item{trt_col}{If the treatment is not named 'A' in dta, specify the treatment
-column index.}
+\item{trt_col}{If the treatment is not named 'A' in dta, specify the
+treatment column index.}
 
-\item{out_col}{If the outcome is not named 'Y', specify the outcome column index.}
+\item{out_col}{If the outcome is not named 'Y', specify the outcome column
+index.}
 
 \item{alpha_re_bound}{The lower and upper end of the values for bi we will
 look at. Defaults to 10, meaning we will look between - 10 and 10.}
 
-\item{integral_bound}{The number of standard deviations of the random effect that
-will be used as the lower and upper limit.}
+\item{integral_bound}{The number of standard deviations of the random effect
+that will be used as the lower and upper limit.}
 
-\item{keep_re_alpha}{Logical. If set to TRUE the "random" effect that makes the
-average probability of treatment equal to alpha will be returned along with the
-estimated group average potential outcome.}
+\item{keep_re_alpha}{Logical. If set to TRUE the "random" effect that makes
+the average probability of treatment equal to alpha will be returned along
+with the estimated group average potential outcome.}
 }
 \description{
 Function that estimates the group average potential outcome using IPW.

@@ -4,8 +4,7 @@
 \alias{CalcNumerator}
 \title{Calculate the numerator in the estimator Yhat.}
 \usage{
-CalcNumerator(Ai_j, Xi_j, coef_hat, alpha, alpha_re_bound = 10,
-  re_alpha = NULL)
+CalcNumerator(Ai_j, Xi_j, coef_hat, alpha, re_alpha)
 }
 \arguments{
 \item{Ai_j}{A vector of length n_i - 1 including the treatment assignment of all but
@@ -18,11 +17,8 @@ can be the observed values or a counterfactual set of covariates.}
 
 \item{alpha}{The average probability of treatment among the n_i - 1 units.}
 
-\item{alpha_re_bound}{The lower and upper end of the values for bi we will
-look at. Defaults to 10, meaning we will look between - 10 and 10.}
-
 \item{re_alpha}{The fixed effect bi that gives average propensity of treatment in
-the group equal to alpha. If set to NULL, it will be calculated.}
+the group equal to alpha.}
 }
 \description{
 Calculate the numerator in the estimator Yhat.
