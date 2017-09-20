@@ -3,9 +3,12 @@ IEvar <- function(ygroup, alpha, ps = c('true', 'estimated'), scores = NULL) {
   
   ps <- match.arg(ps)
   ie_var <- array(NA, dim = c(2, 2, length(alpha), length(alpha)))
+  n_neigh <- dim(ygroup)[1]
+  
   for (a1 in 1 : (length(alpha) - 1)) {
     for (a2 in (a1 + 1) : length(alpha)) {
       ie_var[, , a1, a2] <- cov(cbind(ygroup[, a1], ygroup[, a2]))
+      ie_var[, , a1, a2] <- ie_var[, , a1, a2] * (n_neigh - 1) / (n_neigh ^ 2)
       ie_var[, , a2, a1] <- ie_var[, , a1, a2]
     }
   }
