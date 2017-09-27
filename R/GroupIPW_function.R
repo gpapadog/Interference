@@ -31,8 +31,13 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   integral_bound <- abs(integral_bound)
   alpha_re_bound <- abs(alpha_re_bound)
   phi_hat[[1]] <- matrix(phi_hat[[1]], ncol = 1)
-  
   dta <- as.data.frame(dta)
+  
+  # Specifyling neigh_ind will avoid re-running the following lines.
+  if (is.null(neigh_ind)) {
+    neigh_ind <- sapply(1 : max(dta$neigh), function(x) which(dta$neigh == x))
+  }
+  
   n_neigh <- length(neigh_ind)
   
   yhat_group <- array(NA, dim = c(n_neigh, 2, length(alpha)))
@@ -49,12 +54,6 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
     gamma_numer <- matrix(phi_hat[[1]], ncol = 1)
   }
   
-  # Specifyling neigh_ind will avoid re-running the following lines.
-  if (is.null(neigh_ind)) {
-    for (nn in 1:n_neigh) {
-      neigh_ind[[nn]] <- which(dta$neigh == nn)
-    }
-  }
   
   if (keep_re_alpha) {
     re_alphas <- matrix(NA, nrow = n_neigh, ncol = length(alpha))
@@ -62,7 +61,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   }
   
   for (aa in 1 : length(alpha)) {
-    print(paste('alpha =', alpha[aa]))
+    print(paste('alpha =', round(alpha[aa], 3)))
     curr_alpha <- alpha[[aa]]
     
     for (nn in 1 : n_neigh) {
@@ -72,7 +71,9 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
       lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
       re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
                                 alpha_re_bound = alpha_re_bound)
-      re_alphas[nn, aa] <- re_alpha
+      if (keep_re_alpha) {
+        re_alphas[nn, aa] <- re_alpha
+      }
 
       for (it in c(0, 1)) {
         curr_it <- it

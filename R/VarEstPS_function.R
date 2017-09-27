@@ -1,11 +1,36 @@
 #' Variance of the population average potential outcome for a correctly
 #' specified propensity score model.
 #' 
+#' @param dta The data set including (at least) the treatment and covaratiates.
+#' @param yhat_group An array including the group average potential outcome
+#' estimates where the dimensions correspond to group, individual treatment and
+#' value of alpha.
+#' @param yhat_pop A matrix including the population average potential outcome
+#' estimates where dimensions are individual treatment and alpha. If left NULL,
+#' it will be calculated using the means of yhat_group.
+#' @param neigh_ind A list including one element for each neighborhood. That
+#' element includes the indices of the observations in dta that belong to each
+#' neighborhood. Can be left NULL if dta includes a column neigh.
+#' @param phi_hat A list with two elements. The first one is a vector of
+#' coefficients of the propensity score, and the second one is the random
+#' effect variance.
+#' @param cov_cols The indeces including the covariates of the propensity score
+#' model.
+#' @param trt_name The name of the treatment column. If it is 'A', you can
+#' leave NULL.
+#' 
 #' @export
-VarEstPS <- function(dta, yhat_group, yhat_pop, neigh_ind, phi_hat, cov_cols,
-                     var_true = NULL, trt_name = NULL, scores = NULL) {
+VarEstPS <- function(dta, yhat_group, yhat_pop = NULL, neigh_ind = NULL,
+                     phi_hat, cov_cols, var_true = NULL, trt_name = NULL,
+                     scores = NULL) {
  
   num_gamma <- length(phi_hat[[1]]) + 1
+  
+  if (is.null(neigh_ind)) {
+    n_neigh <- max(dta$neigh)
+    neigh_ind <- sapply(1 : n_neigh, function(x) which(dta$neigh == x))
+  }
+  
   n_neigh <- length(neigh_ind)
   
   phi_hat[[1]] <- matrix(phi_hat[[1]], ncol = 1)
@@ -19,6 +44,10 @@ VarEstPS <- function(dta, yhat_group, yhat_pop, neigh_ind, phi_hat, cov_cols,
   # Getting the variance if the PS was the true.
   if (is.null(var_true)) {
     var_true <- YpopTruePS(ygroup = yhat_group, alpha = alpha)$ypop_var
+  }
+  
+  if (is.null(yhat_pop)) {
+    yhat_pop <- apply(yhat_group, c(2, 3), mean)
   }
 
   var_est_ps <- array(NA, dim = c(2, 2, length(alpha)))
