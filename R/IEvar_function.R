@@ -34,8 +34,8 @@ IEvar <- function(ygroup, alpha, ps = c('true', 'estimated'), scores = NULL) {
   B11_inv <- chol2inv(chol(B11))
   
   # Calculating C21, and D12.
-  ypop <- apply(ygroup, 1, mean)
-  
+  ypop <- apply(ygroup, 2, mean)
+
   for (a1 in 1 : (length(alpha) - 1)) {
     for (a2 in (a1 + 1) : length(alpha)) {
       
