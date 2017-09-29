@@ -2,16 +2,11 @@
 IEvar <- function(ygroup, alpha, ps = c('true', 'estimated'), scores = NULL) {
   
   ps <- match.arg(ps)
-  ie_var <- array(NA, dim = c(2, 2, length(alpha), length(alpha)))
   n_neigh <- dim(ygroup)[1]
   
-  for (a1 in 1 : (length(alpha) - 1)) {
-    for (a2 in (a1 + 1) : length(alpha)) {
-      ie_var[, , a1, a2] <- cov(cbind(ygroup[, a1], ygroup[, a2]))
-      ie_var[, , a1, a2] <- ie_var[, , a1, a2] * (n_neigh - 1) / (n_neigh ^ 2)
-      ie_var[, , a2, a1] <- ie_var[, , a1, a2]
-    }
-  }
+  ie_var <- cov(ygroup)
+  ie_var <- ie_var * (n_neigh - 1) / (n_neigh ^ 2)
+  
   if (ps == 'true') {
     return(ie_var)
   }
@@ -35,32 +30,23 @@ IEvar <- function(ygroup, alpha, ps = c('true', 'estimated'), scores = NULL) {
   
   # Calculating C21, and D12.
   ypop <- apply(ygroup, 2, mean)
-
-  for (a1 in 1 : (length(alpha) - 1)) {
-    for (a2 in (a1 + 1) : length(alpha)) {
-      
-      C21 <- array(0, dim = c(2, num_gamma))
-      D12 <- array(0, dim = c(num_gamma, 2))
-      
-      for (nn in 1 : n_neigh) {
-        C21[1, ] <- C21[1, ] - ygroup[nn, a1] * scores[, nn]
-        C21[2, ] <- C21[2, ] - ygroup[nn, a2] * scores[, nn]
-        
-        D12[, 1] <- D12[, 1] + scores[, nn] * (ygroup[nn, a1] - ypop[a1])
-        D12[, 2] <- D12[, 2] + scores[, nn] * (ygroup[nn, a2] - ypop[a2])
-      }
-      C21 <- C21 / n_neigh
-      D12 <- D12 / n_neigh
-      
-      chol_B11_inv <- chol(B11_inv)
-      mat1 <- C21 %*% t(chol_B11_inv) %*% t(C21 %*% t(chol_B11_inv))
-      mat <- C21 %*% B11_inv %*% D12
-      
-      var_est_ps[, , a1, a2] <- mat1 + mat + t(mat)
-      var_est_ps[, , a1, a2] <- var_est_ps[, , a1, a2] / n_neigh
-      var_est_ps[, , a1, a2] <- ie_var[, , a1, a2] + var_est_ps[, , a1, a2]
-      var_est_ps[, , a2, a1] <- var_est_ps[, , a1, a2]
-    }
+  
+  C21 <- array(0, dim = c(length(alpha), num_gamma))
+  D12 <- array(0, dim = c(num_gamma, length(alpha)))
+  
+  for (nn in 1 : n_neigh) {
+    C21 <- C21 - t(ygroup[nn, , drop = FALSE]) %*% t(scores[, nn, drop = FALSE])
+    D12 <- D12 + scores[, nn, drop = FALSE] %*% (ygroup[nn, , drop = FALSE] - ypop)
   }
+  C21 <- C21 / n_neigh
+  D12 <- D12 / n_neigh
+  
+  chol_B11_inv <- chol(B11_inv)
+  mat1 <- C21 %*% t(chol_B11_inv) %*% t(C21 %*% t(chol_B11_inv))
+  mat <- C21 %*% B11_inv %*% D12
+  
+  var_est_ps <- mat1 + mat + t(mat)
+  var_est_ps <- ie_var + var_est_ps / n_neigh
+  
   return(var_est_ps) 
 }
