@@ -20,7 +20,7 @@ IE <- function(ypop, ypop_var, alpha) {
   
   for (a1 in 1 : length(alpha)) {
     for (a2 in 1 : length(alpha)) {
-      ie[1, a1, a2] <- ypop[a1] - ypop[a2]
+      ie[1, a1, a2] <- ypop[a2] - ypop[a1]
       ie[2, a1, a2] <- delta_method(ie_var[c(a1, a2), c(a1, a2)])
       ie[c(3, 4), a1, a2] <- ie[1, a1, a2] + 1.96 * c(- 1, 1) * sqrt(ie[2, a1, a2])
     }
