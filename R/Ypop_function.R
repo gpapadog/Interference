@@ -4,14 +4,14 @@
 #' @param ygroup An array including the group average potential outcome
 #' estimates where the dimensions correspond to group, individual treatment and
 #' value of alpha.
-#' @param prop_score String. Can take values 'true', or 'estimated' for known 
-#' or estimated propensity score. Defaults to 'true'.
+#' @param ps String. Can take values 'true', or 'estimated' for known or
+#' estimated propensity score. Defaults to 'true'.
 #' @param scores A matrix with rows corresponding to the parameters of the
 #' propensity score model and columns for groups. Includes the score of the
 #' propensity score evaluated for the variables of each group.
 #' 
 #' @export
-Ypop <- function(ygroup, prop_score = c('true', 'estimated'), scores = NULL) {
+Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
   
   use <- 'pairwise.complete.obs'
   prop_score <- match.arg(prop_score)
