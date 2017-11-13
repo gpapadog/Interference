@@ -14,7 +14,7 @@
 Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
   
   use <- 'pairwise.complete.obs'
-  prop_score <- match.arg(prop_score)
+  ps <- match.arg(ps)
   n_neigh <- dim(ygroup)[1]
   alpha <- as.numeric(dimnames(ygroup)[[3]])
   ypop <- apply(ygroup, c(2, 3), mean, na.rm = TRUE)
@@ -25,7 +25,7 @@ Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
   ypop_var <- ypop_var * (n_neigh - 1) / n_neigh
   ypop_var <- ypop_var / n_neigh  # Since we have n_neigh clusters.
   
-  if (prop_score == 'true') {
+  if (ps == 'true') {
     return(list(ypop = ypop, ypop_var = ypop_var))
   }
   
