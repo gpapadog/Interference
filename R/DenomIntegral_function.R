@@ -1,5 +1,7 @@
 #' Function that calculates the integral in the denominator corresponding to the
 #' marginal likelihood of the vector A, given X and the fixed effects.
+#' 
+#' @export
 DenomIntegral <- function(A, X, phi_hat, alpha = NULL, integral_bound = 10,
                           include_alpha = TRUE) {
   

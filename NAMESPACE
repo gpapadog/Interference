@@ -2,6 +2,7 @@
 
 export(CalcScore)
 export(DE)
+export(DenomIntegral)
 export(GetSimData)
 export(GroupIPW)
 export(IE)
