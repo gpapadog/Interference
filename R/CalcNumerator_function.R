@@ -8,8 +8,6 @@
 #' @param alpha The average probability of treatment among the n_i - 1 units.
 #' @param re_alpha The fixed effect bi that gives average propensity of treatment in
 #' the group equal to alpha.
-#' 
-#' @export
 CalcNumerator <- function(Ai_j, Xi_j, coef_hat, alpha, re_alpha) {
   
   coef_hat <- matrix(coef_hat, nrow = length(coef_hat), ncol = 1)

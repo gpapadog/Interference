@@ -1,3 +1,15 @@
+#' Asymptotic variance of population average potential outcome vector for
+#' different alphas.
+#' 
+#' @param ygroup An matrix including the group average potential outcome
+#' estimates where rows correspond to group, and columns to values of alpha.
+#' @param ps String. Can take values 'true', or 'estimated' for known or
+#' estimated propensity score. Defaults to 'true'.
+#' @param scores A matrix with rows corresponding to the parameters of the
+#' propensity score model and columns for groups. Includes the score of the
+#' propensity score evaluated for the variables of each group. Can be left
+#' NULL for ps = 'true'.
+#' 
 #' @export
 IEvar <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
   

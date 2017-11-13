@@ -1,15 +1,13 @@
 #' Indirect effect estimates and asymptotic variance.
 #' 
-#' @param ypop A vector of the population average potential outcome for the
-#' values of alpha.
-#' @param ypop_var An array with dimensions 2, 2, alpha, alpha, including the
-#' covariance matrix of the average potential outcome under two specifications
-#' of alpha.
-#' @param alpha The values of alpha we consider.
-#' 
-#' @return A 3-dimensional array with dimension 1 equal to 2 including the
-#' estimate and the asymptotic variance. The remaining two dimensions
-#' correspond to values of alpha.
+#' @param ygroup An matrix including the group average potential outcome
+#' estimates where rows correspond to group, and columns to values of alpha.
+#' @param ps String. Can take values 'true', or 'estimated' for known or
+#' estimated propensity score. Defaults to 'true'.
+#' @param scores A matrix with rows corresponding to the parameters of the
+#' propensity score model and columns for groups. Includes the score of the
+#' propensity score evaluated for the variables of each group. Can be left
+#' NULL for ps = 'true'.
 #' 
 #' @export
 IE <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {

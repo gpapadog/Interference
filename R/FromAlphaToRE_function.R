@@ -6,6 +6,7 @@
 #' remaining units. Includes intercept and fixed effects.
 #' @param alpha_re_bound The lower and upper end of the values for bi we will
 #' look at. Defaults to 10, meaning we will look between - 10 and 10.
+#' 
 FromAlphaToRE <- function(alpha, lin_pred, alpha_re_bound = 10) {
   
   alpha_re_bound <- abs(alpha_re_bound)

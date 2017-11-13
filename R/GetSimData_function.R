@@ -1,3 +1,5 @@
+#' Simulating treatment assignment for interference data.
+#' 
 #' @param dta A data frame including the following variables: neigh varying from 1 to
 #' the number of neighborhoods, and two covariates X1 and X2.
 #' @param pot_out A list of length equal to the number of clusters. Each element is an
