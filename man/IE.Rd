@@ -4,7 +4,7 @@
 \alias{IE}
 \title{Indirect effect estimates and asymptotic variance.}
 \usage{
-IE(ypop, ypop_var, alpha)
+IE(ygroup, ps = c("true", "estimated"), scores = NULL)
 }
 \arguments{
 \item{ypop}{A vector of the population average potential outcome for the
