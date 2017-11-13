@@ -28,5 +28,8 @@ DE <- function(ypop, ypop_var, alpha = NULL) {
   de[1, ] <- ypop[2, ] - ypop[1, ]
   de[2, ] <- apply(ypop_var, 3, delta_method)
   
+  de <- rbind(de, low_int = de[1, ] - 1.96 * sqrt(de[2, ]))
+  de <- rbind(de, high_int = de[1, ] + 1.96 * sqrt(de[2, ]))
+  
   return(de)
 }
