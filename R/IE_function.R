@@ -12,7 +12,13 @@
 #' correspond to values of alpha.
 #' 
 #' @export
-IE <- function(ypop, ypop_var, alpha) {
+IE <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
+  
+  alpha <- as.numeric(dimnames(ygroup)[[2]])
+  ypop <- apply(ygroup, 2, mean)
+  names(ypop) <- alpha
+  
+  ie_var <- IEvar(ygroup = ygroup, ps = ps, scores = scores)
   
   ie <- array(NA, dim = c(4, length(alpha), length(alpha)))
   dimnames(ie) <- list(stat = c('est', 'var', 'LB', 'UB'), alpha1 = alpha,

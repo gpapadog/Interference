@@ -1,8 +1,9 @@
 #' @export
-IEvar <- function(ygroup, alpha, ps = c('true', 'estimated'), scores = NULL) {
+IEvar <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
   
   ps <- match.arg(ps)
   n_neigh <- dim(ygroup)[1]
+  alpha <- as.numeric(dimnames(ygroup)[[2]])
   
   ie_var <- cov(ygroup)
   ie_var <- ie_var * (n_neigh - 1) / (n_neigh ^ 2)
