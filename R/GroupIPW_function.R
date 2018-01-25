@@ -5,7 +5,8 @@
 #' @param phi_hat A list with two elements. The first one is a vector of
 #' coefficients of the ps, and the second one is the random effect variance.
 #' @param gamma_numer The coefficients of the ps model in the numerator.
-#' If left NULL, the coefficients in phi_hat will be used instead.
+#' If left NULL and estimand is 1, the coefficients in phi_hat will be used
+#' instead.
 #' @param alpha The values of alpha for which we want to estimate the group
 #' average potential outcome.
 #' @param neigh_ind List. i^{th} element is a vector with the row indices of
@@ -21,13 +22,17 @@
 #' @param keep_re_alpha Logical. If set to TRUE the "random" effect that makes
 #' the average probability of treatment equal to alpha will be returned along
 #' with the estimated group average potential outcome.
+#' @param estimand Character, either '1' or '2.' If 1 is specified, then the
+#' estimand with numerator depending on covariates is estimated. If estimand
+#' is set equal to 2, the numerator considered is the product of Bernoulli.
 #' 
 #' @export
 GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
                      neigh_ind = NULL, trt_col = NULL, out_col = NULL, 
                      alpha_re_bound = 10, integral_bound = 10,
-                     keep_re_alpha = FALSE) {
+                     keep_re_alpha = FALSE, estimand = c('1', '2')) {
   
+  estimand <- match.arg(estimand)
   integral_bound <- abs(integral_bound)
   alpha_re_bound <- abs(alpha_re_bound)
   phi_hat[[1]] <- matrix(phi_hat[[1]], ncol = 1)
@@ -69,8 +74,10 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
       # Calculating the random effect that gives alpha.
       Xi <- dta[neigh_ind[[nn]], cov_cols]
       lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
-      re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
-                                alpha_re_bound = alpha_re_bound)
+      if (estimand == '1') {
+        re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
+                                  alpha_re_bound = alpha_re_bound)
+      }
       if (keep_re_alpha) {
         re_alphas[nn, aa] <- re_alpha
       }
@@ -88,9 +95,13 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
             Ai_j <- dta$A[wh_others]
             Xi_j <- dta[wh_others, cov_cols]
             
-            prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
-                                      coef_hat = gamma_numer,
-                                      alpha = curr_alpha, re_alpha = re_alpha)
+            prob_ind <- list(prob = 1)
+            if (estimand == '1') {
+              prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
+                                        coef_hat = gamma_numer,
+                                        alpha = curr_alpha, re_alpha = re_alpha,
+                                        estimand = estimand)
+            }
             y_curr <- y_curr + dta$Y[ind] * prob_ind$prob
           }
         }
