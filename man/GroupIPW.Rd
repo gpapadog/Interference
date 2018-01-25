@@ -6,7 +6,7 @@
 \usage{
 GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   neigh_ind = NULL, trt_col = NULL, out_col = NULL, alpha_re_bound = 10,
-  integral_bound = 10, keep_re_alpha = FALSE)
+  integral_bound = 10, keep_re_alpha = FALSE, estimand = c("1", "2"))
 }
 \arguments{
 \item{dta}{Data frame including treatment, outcome and covariates.}
@@ -17,7 +17,8 @@ GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
 coefficients of the ps, and the second one is the random effect variance.}
 
 \item{gamma_numer}{The coefficients of the ps model in the numerator.
-If left NULL, the coefficients in phi_hat will be used instead.}
+If left NULL and estimand is 1, the coefficients in phi_hat will be used
+instead.}
 
 \item{alpha}{The values of alpha for which we want to estimate the group
 average potential outcome.}
@@ -40,6 +41,10 @@ that will be used as the lower and upper limit.}
 \item{keep_re_alpha}{Logical. If set to TRUE the "random" effect that makes
 the average probability of treatment equal to alpha will be returned along
 with the estimated group average potential outcome.}
+
+\item{estimand}{Character, either '1' or '2.' If 1 is specified, then the
+estimand with numerator depending on covariates is estimated. If estimand
+is set equal to 2, the numerator considered is the product of Bernoulli.}
 }
 \description{
 Function that estimates the group average potential outcome using IPW.

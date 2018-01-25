@@ -38,6 +38,9 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   phi_hat[[1]] <- matrix(phi_hat[[1]], ncol = 1)
   dta <- as.data.frame(dta)
   
+  # We only return the ksi's if we are estimating estimand 1.
+  keep_re_alpha <- keep_re_alpha & (estimand == '1')
+  
   # Specifyling neigh_ind will avoid re-running the following lines.
   if (is.null(neigh_ind)) {
     neigh_ind <- sapply(1 : max(dta$neigh), function(x) which(dta$neigh == x))
@@ -59,7 +62,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
     gamma_numer <- matrix(phi_hat[[1]], ncol = 1)
   }
   
-  
+  # If we want to return the ksis that make average propensity alpha.
   if (keep_re_alpha) {
     re_alphas <- matrix(NA, nrow = n_neigh, ncol = length(alpha))
     dimnames(re_alphas) <- list(neigh = 1 : n_neigh, alpha = alpha)
@@ -71,23 +74,30 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
     
     for (nn in 1 : n_neigh) {
       
-      # Calculating the random effect that gives alpha.
-      Xi <- dta[neigh_ind[[nn]], cov_cols]
-      lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
+      # For estimand 1, we need to calculate numerator depending on covariates.
       if (estimand == '1') {
+        
+        # Calculating the random effect that gives alpha.
+        Xi <- dta[neigh_ind[[nn]], cov_cols]
+        lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
         re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
                                   alpha_re_bound = alpha_re_bound)
-      }
-      if (keep_re_alpha) {
-        re_alphas[nn, aa] <- re_alpha
+        
+        # Keeping the intercept that makes cluster average propensity alpha.
+        if (keep_re_alpha) {
+          re_alphas[nn, aa] <- re_alpha
+        }
+        
       }
 
-      for (it in c(0, 1)) {
-        curr_it <- it
+      for (curr_it in c(0, 1)) {
+        
         bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
+        prob_ind <- list(prob = 1)  # For estimand 2.
         
         # If no individuals have treatement it we cannot estimate the group average.
         y_curr <- ifelse(sum(dta$A[neigh_ind[[nn]]] == curr_it) == 0, NA, 0)
+        
         for (ind in neigh_ind[[nn]]) {
           if (dta$A[ind] == curr_it) {
             
@@ -95,12 +105,10 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
             Ai_j <- dta$A[wh_others]
             Xi_j <- dta[wh_others, cov_cols]
             
-            prob_ind <- list(prob = 1)
             if (estimand == '1') {
               prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
                                         coef_hat = gamma_numer,
-                                        alpha = curr_alpha, re_alpha = re_alpha,
-                                        estimand = estimand)
+                                        alpha = curr_alpha, re_alpha = re_alpha)
             }
             y_curr <- y_curr + dta$Y[ind] * prob_ind$prob
           }
@@ -112,7 +120,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
                                integral_bound = integral_bound)
         denom <- length(neigh_ind[[nn]]) * denom$value * bern_prob
         
-        yhat_group[nn, it + 1, aa] <- y_curr / denom
+        yhat_group[nn, curr_it + 1, aa] <- y_curr / denom
       }
     }
   }
