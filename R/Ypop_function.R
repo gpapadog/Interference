@@ -9,9 +9,12 @@
 #' @param scores A matrix with rows corresponding to the parameters of the
 #' propensity score model and columns for groups. Includes the score of the
 #' propensity score evaluated for the variables of each group.
+#' @param dta The data set including the variable neigh. Defaults to NULL. Can
+#' be left NULL when the true propensity score is used.
 #' 
 #' @export
-Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL) {
+Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL,
+                 dta = NULL) {
   
   use <- 'pairwise.complete.obs'
   ps <- match.arg(ps)
