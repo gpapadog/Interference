@@ -5,7 +5,7 @@
 \title{Estimates and variance of the population average potential outcome for known
 or correctly specified propensity score model.}
 \usage{
-Ypop(ygroup, ps = c("true", "estimated"), scores = NULL)
+Ypop(ygroup, ps = c("true", "estimated"), scores = NULL, dta = NULL)
 }
 \arguments{
 \item{ygroup}{An array including the group average potential outcome
@@ -18,6 +18,9 @@ estimated propensity score. Defaults to 'true'.}
 \item{scores}{A matrix with rows corresponding to the parameters of the
 propensity score model and columns for groups. Includes the score of the
 propensity score evaluated for the variables of each group.}
+
+\item{dta}{The data set including the variable neigh. Defaults to NULL. Can
+be left NULL when the true propensity score is used.}
 }
 \description{
 Estimates and variance of the population average potential outcome for known
