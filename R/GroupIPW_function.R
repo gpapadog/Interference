@@ -101,15 +101,15 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
         for (ind in neigh_ind[[nn]]) {
           if (dta$A[ind] == curr_it) {
             
-            wh_others <- setdiff(neigh_ind[[nn]], ind)
-            Ai_j <- dta$A[wh_others]
-            Xi_j <- dta[wh_others, cov_cols]
-            
             if (estimand == '1') {
+              wh_others <- setdiff(neigh_ind[[nn]], ind)
+              Ai_j <- dta$A[wh_others]
+              Xi_j <- dta[wh_others, cov_cols]
               prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
                                         coef_hat = gamma_numer,
                                         alpha = curr_alpha, re_alpha = re_alpha)
             }
+            
             y_curr <- y_curr + dta$Y[ind] * prob_ind$prob
           }
         }
