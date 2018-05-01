@@ -11,6 +11,9 @@
 #' propensity score evaluated for the variables of each group.
 #' @param dta The data set including the variable neigh. Defaults to NULL. Can
 #' be left NULL when the true propensity score is used.
+#' @param use Whether the data with missing values will be used for the
+#' estimation of the variance. Argument for cov() function. Defaults to
+#' 'everything'.
 #' 
 #' @export
 Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL,
