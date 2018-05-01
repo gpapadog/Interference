@@ -14,9 +14,8 @@
 #' 
 #' @export
 Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL,
-                 dta = NULL) {
+                 dta = NULL, use = 'everything') {
   
-  use <- 'pairwise.complete.obs'
   ps <- match.arg(ps)
   n_neigh <- dim(ygroup)[1]
   alpha <- as.numeric(dimnames(ygroup)[[3]])
@@ -27,6 +26,7 @@ Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL,
   # In order to get 1 / N, instead of 1 / (N - 1) in the variance estimates.
   ypop_var <- ypop_var * (n_neigh - 1) / n_neigh
   ypop_var <- ypop_var / n_neigh  # Since we have n_neigh clusters.
+  dimnames(ypop_var) <- list(a = c(0, 1), a = c(0, 1), alpha = alpha)
   
   if (ps == 'true') {
     return(list(ypop = ypop, ypop_var = ypop_var))
