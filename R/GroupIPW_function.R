@@ -94,9 +94,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
         
         bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
         prob_ind <- list(prob = 1)  # For estimand 2.
-        
-        # If no individuals have treatement it we cannot estimate the group average.
-        y_curr <- ifelse(sum(dta$A[neigh_ind[[nn]]] == curr_it) == 0, NA, 0)
+        y_curr <- 0
         
         for (ind in neigh_ind[[nn]]) {
           if (dta$A[ind] == curr_it) {
