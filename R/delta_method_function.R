@@ -1,3 +1,4 @@
+#' @export
 delta_method <- function(x, vec = c(1, - 1))  {
   
   if (length(vec) != dim(x)[1] | length(vec) != dim(x)[2]) {
