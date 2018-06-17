@@ -61,11 +61,7 @@ BipartiteGroupIPW <- function(int_dta, out_dta, cov_cols, phi_hat, alpha,
       for (curr_it in c(0, 1)) {
         
         bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
-        
-        # How many closest power plants have the treatment.
-        num_curr_it <- sum(out_dta$closest_trt[out_neigh_ind[[nn]]] == curr_it)
-        # If none of the closest units have the treatment, don't estimate.
-        y_curr <- ifelse(num_curr_it == 0, NA, 0)
+        y_curr <- 0
         
         for (ind in out_neigh_ind[[nn]]) {
           if (out_dta$closest_trt[ind] == curr_it) {
