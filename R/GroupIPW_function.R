@@ -25,12 +25,14 @@
 #' @param estimand Character, either '1' or '2.' If 1 is specified, then the
 #' estimand with numerator depending on covariates is estimated. If estimand
 #' is set equal to 2, the numerator considered is the product of Bernoulli.
+#' @param verbose Whether printing of progress is wanted. Defaults to TRUE.
 #' 
 #' @export
 GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
                      neigh_ind = NULL, trt_col = NULL, out_col = NULL, 
                      alpha_re_bound = 10, integral_bound = 10,
-                     keep_re_alpha = FALSE, estimand = c('1', '2')) {
+                     keep_re_alpha = FALSE, estimand = c('1', '2'),
+                     verbose = TRUE) {
   
   estimand <- match.arg(estimand)
   integral_bound <- abs(integral_bound)
@@ -69,7 +71,9 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   }
   
   for (aa in 1 : length(alpha)) {
-    print(paste('alpha =', round(alpha[aa], 3)))
+    if (verbose) {
+      print(paste('alpha =', round(alpha[aa], 3)))
+    }
     curr_alpha <- alpha[[aa]]
     
     for (nn in 1 : n_neigh) {

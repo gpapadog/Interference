@@ -6,7 +6,8 @@
 \usage{
 GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   neigh_ind = NULL, trt_col = NULL, out_col = NULL, alpha_re_bound = 10,
-  integral_bound = 10, keep_re_alpha = FALSE, estimand = c("1", "2"))
+  integral_bound = 10, keep_re_alpha = FALSE, estimand = c("1", "2"),
+  verbose = TRUE)
 }
 \arguments{
 \item{dta}{Data frame including treatment, outcome and covariates.}
@@ -45,6 +46,8 @@ with the estimated group average potential outcome.}
 \item{estimand}{Character, either '1' or '2.' If 1 is specified, then the
 estimand with numerator depending on covariates is estimated. If estimand
 is set equal to 2, the numerator considered is the product of Bernoulli.}
+
+\item{verbose}{Whether printing of progress is wanted. Defaults to TRUE.}
 }
 \description{
 Function that estimates the group average potential outcome using IPW.
