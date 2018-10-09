@@ -22,7 +22,9 @@ CalcScore <- function(dta, neigh_ind = NULL, phi_hat, cov_cols,
     neigh_ind <- sapply(1 : n_neigh, function(x) which(dta$neigh == x))
   }
   n_neigh <- length(neigh_ind)
-  num_gamma <- length(phi_hat$coefs) + 1
+  
+  re_var <- phi_hat[[2]]
+  num_gamma <- length(phi_hat$coefs) + (re_var > 0)
   phi_hat$coefs <- matrix(phi_hat$coefs, ncol = 1)
 
   if (is.null(trt_name)) {
@@ -40,15 +42,25 @@ CalcScore <- function(dta, neigh_ind = NULL, phi_hat, cov_cols,
     hess_function <- function(gamma) {
       
       phi_hat_hess <- NULL
-      phi_hat_hess$coefs <- gamma[- num_gamma]
-      phi_hat_hess$re_var <- gamma[num_gamma]
+      if (re_var == 0) {
+        phi_hat_hess$coefs <- gamma
+        phi_hat_hess$re_var <- 0
+      } else {
+        phi_hat_hess$coefs <- gamma[- num_gamma]
+        phi_hat_hess$re_var <- gamma[num_gamma]
+      }
       
-      likelihood <- Denominator(Ai, Xi, phi_hat_hess, include_alpha = FALSE,
+      likelihood <- Denominator(A = Ai, X = Xi, phi_hat = phi_hat_hess,
+                                include_alpha = FALSE,
                                 integral_bound = integral_bound)
       return(log(likelihood$value))
     }
     
-    scores[, nn] <- numDeriv::grad(hess_function, x = c(phi_hat$coefs, phi_hat$re_var))
+    hess_x <- as.numeric(phi_hat$coefs)
+    if (re_var > 0) {
+      hess_x <- c(hess_x, re_var)
+    }
+    scores[, nn] <- numDeriv::grad(hess_function, x = hess_x)
 
   }
   return(scores)  
