@@ -1,16 +1,18 @@
-#' Simulating treatment assignment for interference data.
+#' Simulating the treatment assignment for interference data.
 #' 
-#' @param dta A data frame including the following variables: neigh varying from 1 to
-#' the number of neighborhoods, and two covariates X1 and X2.
-#' @param pot_out A list of length equal to the number of clusters. Each element is an
-#' array of 3 dimensions. Element ijk of the array is the potential outcome for unit i
-#' in the cluster if the treatment of unit is j - 1 and k - 1 of neighbors are treated.
-#' @param neigh_ind A list of length equal to the number of custers including the row
-#' indices corresponding to each cluster.
-#' @param re_sd The standard deviation of the cluster specific random effect for the
-#' propensity score model.
-#' @param trt_coef Coefficients of the propensity score model corresponding to the
-#' intercept, and the two covariates in dta.
+#' @param dta A data frame including the following variables: neigh varying
+#' from 1 to the number of neighborhoods, and two covariates X1 and X2.
+#' @param pot_out A list of length equal to the number of clusters. Each
+#' element is an array of 3 dimensions. Element ijk of the array is the
+#' potential outcome for unit i in the cluster if the treatment of unit is
+#' j - 1 and k - 1 of neighbors are treated.
+#' @param neigh_ind A list of length equal to the number of custers including
+#' the row indices corresponding to each cluster.
+#' @param re_sd The standard deviation of the cluster specific random effect
+#' for the propensity score model. If set to 0, the propensity score model
+#' includes only fixed effects.
+#' @param trt_coef Coefficients of the propensity score model corresponding to
+#' the intercept, and the two covariates in dta.
 #' 
 #' @export
 GetSimData <- function(dta, pot_out, neigh_ind, re_sd, trt_coef) {
