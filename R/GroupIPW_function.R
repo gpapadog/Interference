@@ -4,6 +4,7 @@
 #' @param cov_cols The indices including the covariates of the ps model.
 #' @param phi_hat A list with two elements. The first one is a vector of
 #' coefficients of the ps, and the second one is the random effect variance.
+#' If the second element is 0, the propensity score excludes random effects.
 #' @param gamma_numer The coefficients of the ps model in the numerator.
 #' If left NULL and estimand is 1, the coefficients in phi_hat will be used
 #' instead.
@@ -83,7 +84,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
         
         # Calculating the random effect that gives alpha.
         Xi <- dta[neigh_ind[[nn]], cov_cols]
-        lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
+        lin_pred <- cbind(1, as.matrix(Xi)) %*% gamma_numer
         re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
                                   alpha_re_bound = alpha_re_bound)
         
