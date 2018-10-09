@@ -57,7 +57,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   if (!is.null(trt_col)) {
     names(dta)[trt_col] <- 'A'
   }
-  if (!is.null(trt_col)) {
+  if (!is.null(out_col)) {
     names(dta)[out_col] <- 'Y'
   }
   if (is.null(gamma_numer)) {

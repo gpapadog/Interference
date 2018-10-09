@@ -19,9 +19,14 @@
 #' propensity score model. 2) trt_coef The coefficients of the covariates in
 #' the counterfactual treatment allocation model.
 #' @param verbose Logical. Whether progress is printed. Defaults to TRUE.
+#' @param trt_col If the treatment is not named 'A' in dta, specify the
+#' treatment column index.
+#' @param out_col If the outcome is not named 'Y', specify the outcome column
+#' index.
 #' 
 BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
-                    phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE) {
+                    phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE,
+                    use_control = FALSE, trt_col = NULL, out_col = NULL) {
   
   num_clus <- max(dta$neigh)
   ps <- match.arg(ps)
@@ -56,14 +61,22 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
                               phi_hat = phi_hat_true, gamma_numer = NULL,
                               alpha = alpha, neigh_ind = neigh_ind,
                               keep_re_alpha = FALSE, estimand = '1',
-                              verbose = FALSE)$yhat_group
+                              verbose = FALSE, trt_col = trt_col,
+                              out_col = out_col)$yhat_group
       ygroup_boot[is.na(ygroup_boot)] <- 0
       boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean) 
       
     } else {
       
-      glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
-                           family = binomial)
+      if (use_control) {
+        glm_control <- glmerControl(optimizer = "bobyqa",
+                                    optCtrl = list(maxfun = 2e5))
+        glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
+                             family = binomial, control = glm_control)
+      } else {
+        glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
+                             family = binomial)
+      }
       re_var <- as.numeric(summary(glmod)$varcor)
       
       if (re_var > 0) {
@@ -74,7 +87,8 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
                                 gamma_numer = ps_info_est$trt_coef,
                                 alpha = alpha, neigh_ind = neigh_ind,
                                 keep_re_alpha = FALSE, estimand = '1',
-                                verbose = FALSE)$yhat_group
+                                verbose = FALSE, trt_col = trt_col,
+                                out_col = out_col)$yhat_group
         ygroup_boot[is.na(ygroup_boot)] <- 0
         boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean)
       }
