@@ -94,7 +94,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
         }
         
       }
-
+      
       for (curr_it in c(0, 1)) {
         
         bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
@@ -109,7 +109,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
               Ai_j <- dta$A[wh_others]
               Xi_j <- dta[wh_others, cov_cols]
               prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
-                                        coef_hat = gamma_numer,
+                                        gamma_numer = gamma_numer,
                                         alpha = curr_alpha, re_alpha = re_alpha)
             }
             
@@ -117,10 +117,10 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
           }
         }
         
-        denom <- DenomIntegral(A = dta$A[neigh_ind[[nn]]],
-                               X = dta[neigh_ind[[nn]], cov_cols],
-                               phi_hat = phi_hat, alpha = curr_alpha,
-                               integral_bound = integral_bound)
+        denom <- Denominator(A = dta$A[neigh_ind[[nn]]],
+                             X = dta[neigh_ind[[nn]], cov_cols],
+                             phi_hat = phi_hat, alpha = curr_alpha,
+                             integral_bound = integral_bound)
         denom <- length(neigh_ind[[nn]]) * denom$value * bern_prob
         
         yhat_group[nn, curr_it + 1, aa] <- y_curr / denom

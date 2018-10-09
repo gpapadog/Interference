@@ -43,8 +43,8 @@ CalcScore <- function(dta, neigh_ind = NULL, phi_hat, cov_cols,
       phi_hat_hess$coefs <- gamma[- num_gamma]
       phi_hat_hess$re_var <- gamma[num_gamma]
       
-      likelihood <- DenomIntegral(Ai, Xi, phi_hat_hess, include_alpha = FALSE,
-                                  integral_bound = integral_bound)
+      likelihood <- Denominator(Ai, Xi, phi_hat_hess, include_alpha = FALSE,
+                                integral_bound = integral_bound)
       return(log(likelihood$value))
     }
     
