@@ -57,7 +57,7 @@ Denominator <- function(A, X, phi_hat, alpha = NULL, integral_bound = 10,
     ans <- integrate(f_int, lower = - integral_bound * re_sd,
                      upper = integral_bound * re_sd)
   } else {
-    ans <- f_int(0)
+    ans <- list(value = f_int(0))
   }
 
   return(ans)
