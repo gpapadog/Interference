@@ -1,5 +1,5 @@
-#' Estimates and variance of the population average potential outcome for known
-#' or correctly specified propensity score model.
+#' Estimates and asymptotic variance of the population average potential
+#' outcome for known or estimated propensity score model.
 #' 
 #' @param ygroup An array including the group average potential outcome
 #' estimates where the dimensions correspond to group, individual treatment and
@@ -8,7 +8,8 @@
 #' estimated propensity score. Defaults to 'true'.
 #' @param scores A matrix with rows corresponding to the parameters of the
 #' propensity score model and columns for groups. Includes the score of the
-#' propensity score evaluated for the variables of each group.
+#' propensity score evaluated for the variables of each group. Can be left NULL
+#' when ps is set to 'true'.
 #' @param dta The data set including the variable neigh. Defaults to NULL. Can
 #' be left NULL when the true propensity score is used.
 #' @param use Whether the data with missing values will be used for the
@@ -45,7 +46,6 @@ Ypop <- function(ygroup, ps = c('true', 'estimated'), scores = NULL,
   }
   
   num_gamma <- dim(scores)[1]
-  
 
 
   var_est_ps <- array(NA, dim = c(2, 2, length(alpha)))
