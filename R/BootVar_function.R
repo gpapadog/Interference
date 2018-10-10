@@ -64,7 +64,11 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
       
       if (ps_info_est$ps_with_re) {  # The PS model includes random intercepts.
         
-        if (!is.null(ps_info_est$use_control) & ps_info_est$use_control) {
+        if (is.null(ps_info_est$use_control)) {
+          ps_info_est$use_control <- FALSE
+        }
+        
+        if (ps_info_est$use_control) {
           glm_control <- glmerControl(optimizer = "bobyqa",
                                       optCtrl = list(maxfun = 2e5))
           glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
