@@ -27,16 +27,25 @@
 #' treatment column index.
 #' @param out_col If the outcome is not named 'Y', specify the outcome column
 #' index.
+#' @param return_var Logical. Defaults to FALSE. Whether the function should
+#' return indicators of whether the random effect variance is estimated to be
+#' zero. If ps is set to true, or ps_info_est sets ps_with_re equal to FALSE,
+#' this argument is necessarily FALSE.
 #' 
 #' @export
 BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
                     phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE,
-                    ps_specs = NULL, trt_col = NULL, out_col = NULL) {
+                    ps_specs = NULL, trt_col = NULL, out_col = NULL,
+                    return_var = FALSE) {
   
   ps <- match.arg(ps)
   
   boots <- array(NA, dim = c(2, length(alpha), B))
   dimnames(boots) <- list(po = c('y0', 'y1'), alpha = alpha, sample = 1 : B)
+
+  if (ps == 'est') {
+    re_var_positive <- rep(NA, B)
+  }
   
   for (bb in 1 : B) {
     
@@ -79,6 +88,7 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
         }
         re_var <- as.numeric(summary(glmod)$varcor)
         
+        re_var_positive[bb] <- (re_var > 0)
         
       } else {  # The PS model includes only fixed effects.
         
@@ -98,7 +108,12 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
       boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean)
     }
   }
-  return(boots)
   
+  if (ps == 'est') {
+    if (ps_info_est$ps_with_re & return_var) {
+      return(list(boots = boots, re_var_positive = re_var_positive))
+    }
+  }
+  return(boots)
 }
 
