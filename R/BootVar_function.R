@@ -14,26 +14,29 @@
 #' to 'true'). Elements of the list are trt_coef and re_var including the
 #' coefficients of the propensity score and random effect variance.
 #' @param ps_info_est List of elements for acquiring estimates based on the
-#' estimated propensity score. The list includes 1) glm_form including an
-#' element of formula class including the random intercept formula of the
-#' propensity score model. 2) trt_coef The coefficients of the covariates in
-#' the counterfactual treatment allocation model.
+#' estimated propensity score. The list includes 1) glm_form: Element of 
+#' formula class. The formula can be either for a fixed effects model or for a
+#' model including random intercepts. 2) ps_with_re: An indicator of whether
+#' the propensity score is a mixed model (set to TRUE) or not (set to FALSE).
+#' 3) gamma_numer: The coefficients of the covariates in the counterfactual
+#' treatment allocation model, and 4) use_control: Set to TRUE or FALSE if
+#' you want or do not want additional elements in fitting the mixed model.
+#' use_control does not have to be specified.
 #' @param verbose Logical. Whether progress is printed. Defaults to TRUE.
 #' @param trt_col If the treatment is not named 'A' in dta, specify the
 #' treatment column index.
 #' @param out_col If the outcome is not named 'Y', specify the outcome column
 #' index.
 #' 
+#' @export
 BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
                     phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE,
-                    use_control = FALSE, trt_col = NULL, out_col = NULL) {
+                    ps_specs = NULL, trt_col = NULL, out_col = NULL) {
   
-  num_clus <- max(dta$neigh)
   ps <- match.arg(ps)
   
   boots <- array(NA, dim = c(2, length(alpha), B))
   dimnames(boots) <- list(po = c('y0', 'y1'), alpha = alpha, sample = 1 : B)
-  re_var_positive <- rep(FALSE, B)
   
   for (bb in 1 : B) {
     
@@ -43,59 +46,59 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
       }
     }
     
-    boot_clusters <- sample(1 : num_clus, num_clus, replace = TRUE)
+    boot_dta <- GetBootSample(dta)
+    neigh_ind <- lapply(1 : max(boot_dta$neigh),
+                        function(nn) which(boot_dta$neigh == nn))
     
-    # Binding data without accidentally merging repeated clusters.
-    boot_dta <- NULL
-    for (nn in 1 : num_clus) {
-      D <- subset(dta, neigh == boot_clusters[nn])
-      D$neigh <- nn
-      boot_dta <- rbind(boot_dta, D)
-    }
-    neigh_ind <- lapply(1 : num_clus, function(nn) which(boot_dta$neigh == nn))
-    
-    if (ps == 'true') {
+    if (ps == 'true') { # Known propensity score.
       
-      # Known propensity score.
       ygroup_boot <- GroupIPW(dta = boot_dta, cov_cols = cov_cols,
                               phi_hat = phi_hat_true, gamma_numer = NULL,
                               alpha = alpha, neigh_ind = neigh_ind,
                               keep_re_alpha = FALSE, estimand = '1',
                               verbose = FALSE, trt_col = trt_col,
                               out_col = out_col)$yhat_group
-      ygroup_boot[is.na(ygroup_boot)] <- 0
       boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean) 
       
-    } else {
+    } else {  # Estimated propensity score.
       
-      if (use_control) {
-        glm_control <- glmerControl(optimizer = "bobyqa",
-                                    optCtrl = list(maxfun = 2e5))
-        glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
-                             family = binomial, control = glm_control)
-      } else {
-        glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
-                             family = binomial)
+      if (ps_info_est$ps_with_re) {  # The PS model includes random intercepts.
+        
+        if (is.null(ps_info_est$use_control)) {
+          ps_info_est$use_control <- FALSE
+        }
+        
+        if (ps_info_est$use_control) {
+          glm_control <- glmerControl(optimizer = "bobyqa",
+                                      optCtrl = list(maxfun = 2e5))
+          glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
+                               family = binomial, control = glm_control)
+        } else {
+          glmod <- lme4::glmer(ps_info_est$glm_form, data = boot_dta,
+                               family = binomial)
+        }
+        re_var <- as.numeric(summary(glmod)$varcor)
+        
+        
+      } else {  # The PS model includes only fixed effects.
+        
+        glmod <- glm(ps_info_est$glm_form, data = boot_dta, family = binomial)
+        re_var <- 0
+        
       }
-      re_var <- as.numeric(summary(glmod)$varcor)
       
-      if (re_var > 0) {
-        re_var_positive[bb] <- TRUE
-        phi_hat_est <- list(coefs = summary(glmod)$coef[, 1], re_var = re_var)
-        ygroup_boot <- GroupIPW(dta = boot_dta, cov_cols = cov_cols,
-                                phi_hat = phi_hat_est,
-                                gamma_numer = ps_info_est$trt_coef,
-                                alpha = alpha, neigh_ind = neigh_ind,
-                                keep_re_alpha = FALSE, estimand = '1',
-                                verbose = FALSE, trt_col = trt_col,
-                                out_col = out_col)$yhat_group
-        ygroup_boot[is.na(ygroup_boot)] <- 0
-        boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean)
-      }
+      phi_hat_est <- list(coefs = summary(glmod)$coef[, 1], re_var = re_var)
+      ygroup_boot <- GroupIPW(dta = boot_dta, cov_cols = cov_cols,
+                              phi_hat = phi_hat_est,
+                              gamma_numer = ps_info_est$gamma_numer,
+                              alpha = alpha, neigh_ind = neigh_ind,
+                              keep_re_alpha = FALSE, estimand = '1',
+                              verbose = FALSE, trt_col = trt_col,
+                              out_col = out_col)$yhat_group
+      boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean)
     }
   }
-  if (ps == 'true') {
-    return(list(boots = boots))
-  }
-  return(list(boots = boots, re_var_positive = re_var_positive))
+  return(boots)
+  
 }
+

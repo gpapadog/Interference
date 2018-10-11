@@ -69,10 +69,10 @@ BipartiteGroupIPW <- function(int_dta, out_dta, cov_cols, phi_hat, alpha,
           }
         }
         
-        denom <- DenomIntegral(A = int_dta$A[int_neigh_ind[[nn]]],
-                               X = int_dta[int_neigh_ind[[nn]], cov_cols],
-                               phi_hat = phi_hat, alpha = curr_alpha,
-                               integral_bound = integral_bound)
+        denom <- Denominator(A = int_dta$A[int_neigh_ind[[nn]]],
+                             X = int_dta[int_neigh_ind[[nn]], cov_cols],
+                             phi_hat = phi_hat, alpha = curr_alpha,
+                             integral_bound = integral_bound)
         denom <- length(out_neigh_ind[[nn]]) * denom$value * bern_prob
         
         yhat_group[nn, curr_it + 1, aa] <- y_curr / denom
