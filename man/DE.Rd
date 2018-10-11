@@ -4,7 +4,7 @@
 \alias{DE}
 \title{Direct effect estimates and asymptotic variance.}
 \usage{
-DE(ypop, ypop_var, alpha = NULL)
+DE(ypop, ypop_var, boots = NULL, alpha = NULL)
 }
 \arguments{
 \item{ypop}{A matrix with rows corresponding to the potential outcome under
@@ -14,6 +14,9 @@ propensity of treatment.}
 \item{ypop_var}{An 3-dimensional array, where the first two dimensions are
 equal to 2 and include the variance covariance matrix of the population
 average potential outcome for each alpha. Dimension 3 is alpha.}
+
+\item{boots}{The results of BootVar() function including estimates of the
+potential outcomes from the bootstrap samples.}
 
 \item{alpha}{The values of alpha we consider. If ypop has column names,
 alpha can be left null.}

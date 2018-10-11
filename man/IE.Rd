@@ -4,11 +4,13 @@
 \alias{IE}
 \title{Indirect effect estimates and asymptotic variance.}
 \usage{
-IE(ygroup, ps = c("true", "estimated"), scores = NULL)
+IE(ygroup, boots = NULL, ps = c("true", "estimated"), scores = NULL)
 }
 \arguments{
 \item{ygroup}{An matrix including the group average potential outcome
-estimates where rows correspond to group, and columns to values of alpha.}
+estimates where rows correspond to group, and columns to values of alpha.
+#' @param boots The results of BootVar() function including estimates of the
+potential outcomes from the bootstrap samples.}
 
 \item{ps}{String. Can take values 'true', or 'estimated' for known or
 estimated propensity score. Defaults to 'true'.}

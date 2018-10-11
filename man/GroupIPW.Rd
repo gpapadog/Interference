@@ -15,7 +15,8 @@ GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
 \item{cov_cols}{The indices including the covariates of the ps model.}
 
 \item{phi_hat}{A list with two elements. The first one is a vector of
-coefficients of the ps, and the second one is the random effect variance.}
+coefficients of the ps, and the second one is the random effect variance.
+If the second element is 0, the propensity score excludes random effects.}
 
 \item{gamma_numer}{The coefficients of the ps model in the numerator.
 If left NULL and estimand is 1, the coefficients in phi_hat will be used

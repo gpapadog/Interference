@@ -2,8 +2,8 @@
 % Please edit documentation in R/Ypop_function.R
 \name{Ypop}
 \alias{Ypop}
-\title{Estimates and variance of the population average potential outcome for known
-or correctly specified propensity score model.}
+\title{Estimates and asymptotic variance of the population average potential
+outcome for known or estimated propensity score model.}
 \usage{
 Ypop(ygroup, ps = c("true", "estimated"), scores = NULL, dta = NULL,
   use = "everything")
@@ -18,7 +18,8 @@ estimated propensity score. Defaults to 'true'.}
 
 \item{scores}{A matrix with rows corresponding to the parameters of the
 propensity score model and columns for groups. Includes the score of the
-propensity score evaluated for the variables of each group.}
+propensity score evaluated for the variables of each group. Can be left NULL
+when ps is set to 'true'.}
 
 \item{dta}{The data set including the variable neigh. Defaults to NULL. Can
 be left NULL when the true propensity score is used.}
@@ -28,6 +29,6 @@ estimation of the variance. Argument for cov() function. Defaults to
 'everything'.}
 }
 \description{
-Estimates and variance of the population average potential outcome for known
-or correctly specified propensity score model.
+Estimates and asymptotic variance of the population average potential
+outcome for known or estimated propensity score model.
 }
