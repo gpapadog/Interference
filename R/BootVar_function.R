@@ -27,25 +27,33 @@
 #' treatment column index.
 #' @param out_col If the outcome is not named 'Y', specify the outcome column
 #' index.
-#' @param return_var Logical. Defaults to FALSE. Whether the function should
-#' return indicators of whether the random effect variance is estimated to be
-#' zero. If ps is set to true, or ps_info_est sets ps_with_re equal to FALSE,
-#' this argument is necessarily FALSE.
+#' @param return_everything Logical. Defaults to FALSE. If set to FALSE,
+#' bootstrap estimates of the population average potential outcomes for all
+#' values of alpha will be returned. If set to TRUE, additional information
+#' will be returned including the chosen clusters at every bootstrap sample,
+#' the group-specific estimated average potential outcome, and the random
+#' effect variance of the cluster specific intercept.
 #' 
 #' @export
 BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
                     phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE,
                     ps_specs = NULL, trt_col = NULL, out_col = NULL,
-                    return_var = FALSE) {
+                    return_everything = FALSE) {
   
   ps <- match.arg(ps)
+  n_neigh <- max(dta$neigh)
+  
+  chosen_clusters <- array(NA, dim = c(n_neigh, B))
+  dimnames(chosen_clusters) <- list(neigh = 1 : n_neigh, sample = 1 : B)
+  
+  ygroup <- array(NA, dim = c(n_neigh, 2, length(alpha), B))
+  dimnames(ygroup) <- list(neigh = 1 : n_neigh, po = c('y0', 'y1'),
+                           alpha = alpha, sample = 1 : B)
   
   boots <- array(NA, dim = c(2, length(alpha), B))
-  dimnames(boots) <- list(po = c('y0', 'y1'), alpha = alpha, sample = 1 : B)
+  dimnames(boots) <- dimnames(ygroup)[- 1]
 
-  if (ps == 'est') {
-    re_var_positive <- rep(NA, B)
-  }
+  re_var_positive <- rep(NA, B)
   
   for (bb in 1 : B) {
     
@@ -56,17 +64,22 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
     }
     
     boot_dta <- GetBootSample(dta)
+    chosen_clusters[, bb] <- boot_dta$chosen_clusters
+    
+    boot_dta <- boot_dta$boot_dta
     neigh_ind <- lapply(1 : max(boot_dta$neigh),
                         function(nn) which(boot_dta$neigh == nn))
     
     if (ps == 'true') { # Known propensity score.
       
+      re_var_positive[bb] <- (phi_hat_true[[2]] > 0)
       ygroup_boot <- GroupIPW(dta = boot_dta, cov_cols = cov_cols,
                               phi_hat = phi_hat_true, gamma_numer = NULL,
                               alpha = alpha, neigh_ind = neigh_ind,
                               keep_re_alpha = FALSE, estimand = '1',
                               verbose = FALSE, trt_col = trt_col,
                               out_col = out_col)$yhat_group
+      ygroup[, , , bb] <- ygroup_boot
       boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean) 
       
     } else {  # Estimated propensity score.
@@ -88,14 +101,14 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
         }
         re_var <- as.numeric(summary(glmod)$varcor)
         
-        re_var_positive[bb] <- (re_var > 0)
-        
       } else {  # The PS model includes only fixed effects.
         
         glmod <- glm(ps_info_est$glm_form, data = boot_dta, family = binomial)
         re_var <- 0
         
       }
+      
+      re_var_positive[bb] <- (re_var > 0)
       
       phi_hat_est <- list(coefs = summary(glmod)$coef[, 1], re_var = re_var)
       ygroup_boot <- GroupIPW(dta = boot_dta, cov_cols = cov_cols,
@@ -105,15 +118,17 @@ BootVar <- function(dta, B = 500, alpha, ps = c('true', 'est'), cov_cols,
                               keep_re_alpha = FALSE, estimand = '1',
                               verbose = FALSE, trt_col = trt_col,
                               out_col = out_col)$yhat_group
+      ygroup[, , , bb] <- ygroup_boot
       boots[, , bb] <- apply(ygroup_boot, c(2, 3), mean)
     }
   }
   
-  if (ps == 'est') {
-    if (ps_info_est$ps_with_re & return_var) {
-      return(list(boots = boots, re_var_positive = re_var_positive))
-    }
+  if (return_everything) {
+    return(list(boots = boots, ygroup = ygroup,
+                chosen_clusters = chosen_clusters,
+                re_var_positive = re_var_positive))
   }
+  
   return(boots)
 }
 

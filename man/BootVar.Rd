@@ -6,7 +6,8 @@
 \usage{
 BootVar(dta, B = 500, alpha, ps = c("true", "est"), cov_cols,
   phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE,
-  ps_specs = NULL, trt_col = NULL, out_col = NULL, return_var = FALSE)
+  ps_specs = NULL, trt_col = NULL, out_col = NULL,
+  return_everything = FALSE)
 }
 \arguments{
 \item{dta}{The data frame including the observed data set.}
@@ -43,10 +44,12 @@ treatment column index.}
 \item{out_col}{If the outcome is not named 'Y', specify the outcome column
 index.}
 
-\item{return_var}{Logical. Defaults to FALSE. Whether the function should
-return indicators of whether the random effect variance is estimated to be
-zero. If ps is set to true, or ps_info_est sets ps_with_re equal to FALSE,
-this argument is necessarily FALSE.}
+\item{return_everything}{Logical. Defaults to FALSE. If set to FALSE,
+bootstrap estimates of the population average potential outcomes for all
+values of alpha will be returned. If set to TRUE, additional information
+will be returned including the chosen clusters at every bootstrap sample,
+the group-specific estimated average potential outcome, and the random
+effect variance of the cluster specific intercept.}
 }
 \description{
 Using re-sampling of clusters to acquire an estimate of the potential

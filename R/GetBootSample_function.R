@@ -11,5 +11,5 @@ GetBootSample <- function(dta) {
     boot_dta <- rbind(boot_dta, D)
   }
   
-  return(boot_dta)
+  return(list(boot_dta = boot_dta, chosen_clusters = boot_clusters))
 }
