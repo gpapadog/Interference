@@ -4,6 +4,7 @@
 #' @param cov_cols The indices including the covariates of the ps model.
 #' @param phi_hat A list with two elements. The first one is a vector of
 #' coefficients of the ps, and the second one is the random effect variance.
+#' If the second element is 0, the propensity score excludes random effects.
 #' @param gamma_numer The coefficients of the ps model in the numerator.
 #' If left NULL and estimand is 1, the coefficients in phi_hat will be used
 #' instead.
@@ -57,7 +58,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   if (!is.null(trt_col)) {
     names(dta)[trt_col] <- 'A'
   }
-  if (!is.null(trt_col)) {
+  if (!is.null(out_col)) {
     names(dta)[out_col] <- 'Y'
   }
   if (is.null(gamma_numer)) {
@@ -83,7 +84,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
         
         # Calculating the random effect that gives alpha.
         Xi <- dta[neigh_ind[[nn]], cov_cols]
-        lin_pred <- cbind(1, as.matrix(Xi)) %*% phi_hat[[1]]
+        lin_pred <- cbind(1, as.matrix(Xi)) %*% gamma_numer
         re_alpha <- FromAlphaToRE(alpha = curr_alpha, lin_pred = lin_pred,
                                   alpha_re_bound = alpha_re_bound)
         
@@ -93,7 +94,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
         }
         
       }
-
+      
       for (curr_it in c(0, 1)) {
         
         bern_prob <- curr_alpha ^ curr_it * (1 - curr_alpha) ^ (1 - curr_it)
@@ -108,7 +109,7 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
               Ai_j <- dta$A[wh_others]
               Xi_j <- dta[wh_others, cov_cols]
               prob_ind <- CalcNumerator(Ai_j = Ai_j, Xi_j = Xi_j,
-                                        coef_hat = gamma_numer,
+                                        gamma_numer = gamma_numer,
                                         alpha = curr_alpha, re_alpha = re_alpha)
             }
             
@@ -116,10 +117,10 @@ GroupIPW <- function(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
           }
         }
         
-        denom <- DenomIntegral(A = dta$A[neigh_ind[[nn]]],
-                               X = dta[neigh_ind[[nn]], cov_cols],
-                               phi_hat = phi_hat, alpha = curr_alpha,
-                               integral_bound = integral_bound)
+        denom <- Denominator(A = dta$A[neigh_ind[[nn]]],
+                             X = dta[neigh_ind[[nn]], cov_cols],
+                             phi_hat = phi_hat, alpha = curr_alpha,
+                             integral_bound = integral_bound)
         denom <- length(neigh_ind[[nn]]) * denom$value * bern_prob
         
         yhat_group[nn, curr_it + 1, aa] <- y_curr / denom
