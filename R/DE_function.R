@@ -10,12 +10,17 @@
 #' potential outcomes from the bootstrap samples.
 #' @param alpha The values of alpha we consider. If ypop has column names,
 #' alpha can be left null.
+#' @param alpha_level Numeric. The alpha level of the confidence intervals
+#' based on the quantiles of the bootstrap estimates.
 #' 
 #' @return A matrix with rows including the estimate and variance of the direct
 #' effect and columns corresponding to alpha.
 #' 
 #' @export
-DE <- function(ypop, ypop_var, boots = NULL, alpha = NULL) {
+DE <- function(ypop, ypop_var, boots = NULL, alpha = NULL,
+               alpha_level = 0.05) {
+  
+  quants <- c(0, 1) + c(1, - 1) * alpha_level / 2
   
   if (is.null(alpha)) {
     if (is.null(colnames(ypop))) {
@@ -26,7 +31,8 @@ DE <- function(ypop, ypop_var, boots = NULL, alpha = NULL) {
   
   dim_names <- c('est', 'var', 'low_int', 'high_int')
   if (!is.null(boots)) {
-    dim_names <- c(dim_names, 'boot_var', 'boot_low_int', 'boot_high_int')
+    dim_names <- c(dim_names, 'boot_var', 'boot_var_LB', 'boot_var_UB',
+                   'boot_low_quant', 'boot_high_quant')
   }
   
   de <- array(NA, dim = c(length(dim_names), length(alpha)))
@@ -38,9 +44,11 @@ DE <- function(ypop, ypop_var, boots = NULL, alpha = NULL) {
   de[4, ] <- de[1, ] + 1.96 * sqrt(de[2, ])
   
   if (!is.null(boots)) {
-    de[5, ] <- apply(boots[2, , ] - boots[1, , ], 1, var, na.rm = TRUE)
+    de[5, ] <- apply(boots[2, , ] - boots[1, , ], 1, var)
     de[6, ] <- de[1, ] - 1.96 * sqrt(de[5, ])
     de[7, ] <- de[1, ] + 1.96 * sqrt(de[5, ])
+    de[8 : 9, ] <- apply(boots[2, , ] - boots[1, , ], 1, quantile,
+                         probs = quants)
   }
   
   return(de)

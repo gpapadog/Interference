@@ -10,19 +10,23 @@
 #' propensity score model and columns for groups. Includes the score of the
 #' propensity score evaluated for the variables of each group. Can be left
 #' NULL for ps = 'true'.
+#' @param alpha_level Numeric. The alpha level of the confidence intervals
+#' based on the quantiles of the bootstrap estimates.
 #' 
 #' @export
 IE <- function(ygroup, boots = NULL, ps = c('true', 'estimated'),
-               scores = NULL) {
+               scores = NULL, alpha_level = 0.05) {
   
   alpha <- as.numeric(dimnames(ygroup)[[2]])
   ypop <- apply(ygroup, 2, mean)
   names(ypop) <- alpha
+  quants <- c(0, 1) + c(1, - 1) * alpha_level / 2
   
   ie_var <- IEvar(ygroup = ygroup, ps = ps, scores = scores)
   dim_names <- c('est', 'var', 'LB', 'UB')
   if (!is.null(boots)) {
-    dim_names <- c(dim_names, 'boot_var', 'boot_LB', 'boot_UB')
+    dim_names <- c(dim_names, 'boot_var', 'boot_var_LB', 'boot_var_UB',
+                   'boot_low_quant', 'boot_high_quant')
   }
   
   ie <- array(NA, dim = c(length(dim_names), length(alpha), length(alpha)))
@@ -41,9 +45,11 @@ IE <- function(ygroup, boots = NULL, ps = c('true', 'estimated'),
     ie_var_boots <- array(NA, dim = c(length(alpha), length(alpha)))
     for (a1 in 1 : length(alpha)) {
       for (a2 in 1 : length(alpha)) {
-        ie[5, a1, a2] <- var(boots[1, a1, ] - boots[1, a2, ], na.rm = TRUE)
+        ie[5, a1, a2] <- var(boots[1, a1, ] - boots[1, a2, ])
         ie_sd <- sqrt(ie[5, a1, a2])
         ie[c(6, 7), a1, a2] <- ie[1, a1, a2] + 1.96 * c(- 1, 1) * ie_sd
+        ie[c(8, 9), a1, a2] <- quantile(boots[1, a2, ] - boots[1, a1, ],
+                                        probs = quants)
       }
     }
   }
