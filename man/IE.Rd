@@ -4,7 +4,8 @@
 \alias{IE}
 \title{Indirect effect estimates and asymptotic variance.}
 \usage{
-IE(ygroup, boots = NULL, ps = c("true", "estimated"), scores = NULL)
+IE(ygroup, boots = NULL, ps = c("true", "estimated"), scores = NULL,
+  alpha_level = 0.05)
 }
 \arguments{
 \item{ygroup}{An matrix including the group average potential outcome
@@ -19,6 +20,9 @@ estimated propensity score. Defaults to 'true'.}
 propensity score model and columns for groups. Includes the score of the
 propensity score evaluated for the variables of each group. Can be left
 NULL for ps = 'true'.}
+
+\item{alpha_level}{Numeric. The alpha level of the confidence intervals
+based on the quantiles of the bootstrap estimates.}
 }
 \description{
 Indirect effect estimates and asymptotic variance.

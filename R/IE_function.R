@@ -21,6 +21,7 @@ IE <- function(ygroup, boots = NULL, ps = c('true', 'estimated'),
   ypop <- apply(ygroup, 2, mean)
   names(ypop) <- alpha
   quants <- c(0, 1) + c(1, - 1) * alpha_level / 2
+  norm_quant <- - qnorm(alpha_level / 2)
   
   ie_var <- IEvar(ygroup = ygroup, ps = ps, scores = scores)
   dim_names <- c('est', 'var', 'LB', 'UB')
@@ -37,7 +38,7 @@ IE <- function(ygroup, boots = NULL, ps = c('true', 'estimated'),
       ie[1, a1, a2] <- ypop[a2] - ypop[a1]
       ie[2, a1, a2] <- delta_method(ie_var[c(a1, a2), c(a1, a2)])
       ie_sd <- sqrt(ie[2, a1, a2])
-      ie[c(3, 4), a1, a2] <- ie[1, a1, a2] + 1.96 * c(- 1, 1) * ie_sd
+      ie[c(3, 4), a1, a2] <- ie[1, a1, a2] + norm_quant * c(- 1, 1) * ie_sd
     }
   }
 
@@ -47,7 +48,7 @@ IE <- function(ygroup, boots = NULL, ps = c('true', 'estimated'),
       for (a2 in 1 : length(alpha)) {
         ie[5, a1, a2] <- var(boots[1, a1, ] - boots[1, a2, ])
         ie_sd <- sqrt(ie[5, a1, a2])
-        ie[c(6, 7), a1, a2] <- ie[1, a1, a2] + 1.96 * c(- 1, 1) * ie_sd
+        ie[c(6, 7), a1, a2] <- ie[1, a1, a2] + norm_quant * c(- 1, 1) * ie_sd
         ie[c(8, 9), a1, a2] <- quantile(boots[1, a2, ] - boots[1, a1, ],
                                         probs = quants)
       }

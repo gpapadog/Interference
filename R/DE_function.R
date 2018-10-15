@@ -21,6 +21,7 @@ DE <- function(ypop, ypop_var, boots = NULL, alpha = NULL,
                alpha_level = 0.05) {
   
   quants <- c(0, 1) + c(1, - 1) * alpha_level / 2
+  norm_quant <- - qnorm(alpha_level / 2)
   
   if (is.null(alpha)) {
     if (is.null(colnames(ypop))) {
@@ -40,13 +41,13 @@ DE <- function(ypop, ypop_var, boots = NULL, alpha = NULL,
 
   de[1, ] <- ypop[2, ] - ypop[1, ]
   de[2, ] <- apply(ypop_var, 3, delta_method)
-  de[3, ] <- de[1, ] - 1.96 * sqrt(de[2, ])
-  de[4, ] <- de[1, ] + 1.96 * sqrt(de[2, ])
+  de[3, ] <- de[1, ] - norm_quant * sqrt(de[2, ])
+  de[4, ] <- de[1, ] + norm_quant * sqrt(de[2, ])
   
   if (!is.null(boots)) {
     de[5, ] <- apply(boots[2, , ] - boots[1, , ], 1, var)
-    de[6, ] <- de[1, ] - 1.96 * sqrt(de[5, ])
-    de[7, ] <- de[1, ] + 1.96 * sqrt(de[5, ])
+    de[6, ] <- de[1, ] - norm_quant * sqrt(de[5, ])
+    de[7, ] <- de[1, ] + norm_quant * sqrt(de[5, ])
     de[8 : 9, ] <- apply(boots[2, , ] - boots[1, , ], 1, quantile,
                          probs = quants)
   }

@@ -4,7 +4,7 @@
 \alias{DE}
 \title{Direct effect estimates and asymptotic variance.}
 \usage{
-DE(ypop, ypop_var, boots = NULL, alpha = NULL)
+DE(ypop, ypop_var, boots = NULL, alpha = NULL, alpha_level = 0.05)
 }
 \arguments{
 \item{ypop}{A matrix with rows corresponding to the potential outcome under
@@ -20,6 +20,9 @@ potential outcomes from the bootstrap samples.}
 
 \item{alpha}{The values of alpha we consider. If ypop has column names,
 alpha can be left null.}
+
+\item{alpha_level}{Numeric. The alpha level of the confidence intervals
+based on the quantiles of the bootstrap estimates.}
 }
 \value{
 A matrix with rows including the estimate and variance of the direct
