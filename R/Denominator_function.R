@@ -20,12 +20,8 @@ Denominator <- function(A, X, phi_hat, alpha = NULL, integral_bound = 10,
                         include_alpha = TRUE) {
   
   integral_bound <- abs(integral_bound)
-  if (is.null(alpha)) {
-    if (include_alpha) {
-      stop('No alpha provided.')
-    } # else {  # I dont think I need this part of the code.
-    #   alpha <- mean(A)
-    # }
+  if (is.null(alpha) & include_alpha) {
+    stop('No alpha provided.')
   }
   
   X <- as.matrix(cbind(1, X))

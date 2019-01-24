@@ -1,4 +1,6 @@
-#' Function that estimates the group average potential outcome using IPW.
+#' Estimating the group average potential outcome
+#' 
+#' IPW estimator of the group average potential outcome.
 #'
 #' @param dta Data frame including treatment, outcome and covariates.
 #' @param cov_cols The indices including the covariates of the ps model.

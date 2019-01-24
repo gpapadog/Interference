@@ -2,7 +2,7 @@
 % Please edit documentation in R/GroupIPW_function.R
 \name{GroupIPW}
 \alias{GroupIPW}
-\title{Function that estimates the group average potential outcome using IPW.}
+\title{Estimating the group average potential outcome}
 \usage{
 GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
   neigh_ind = NULL, trt_col = NULL, out_col = NULL, alpha_re_bound = 10,
@@ -51,5 +51,5 @@ is set equal to 2, the numerator considered is the product of Bernoulli.}
 \item{verbose}{Whether printing of progress is wanted. Defaults to TRUE.}
 }
 \description{
-Function that estimates the group average potential outcome using IPW.
+IPW estimator of the group average potential outcome.
 }
