@@ -5,8 +5,8 @@
 \title{Function that estimates the cluster average potential outcome in settings of
 bipartite interference.}
 \usage{
-BipartiteGroupIPW(int_dta, out_dta, cov_cols, phi_hat, alpha, trt_col = NULL,
-  out_col = NULL, integral_bound = 10)
+BipartiteGroupIPW(int_dta, out_dta, cov_cols, phi_hat, alpha,
+  trt_col = NULL, out_col = NULL, integral_bound = 10)
 }
 \arguments{
 \item{int_dta}{Data on the interventional units including treatment,

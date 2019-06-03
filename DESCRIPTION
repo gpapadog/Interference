@@ -10,7 +10,7 @@ License: GPL (>= 2)
 LazyData: TRUE
 URL: https://github.com/gpapadog/Interference
 BugReports: https://github.com/gpapadog/Interference/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Suggests: 
     knitr,
     lme4,
