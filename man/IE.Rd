@@ -4,8 +4,13 @@
 \alias{IE}
 \title{Indirect effect estimates and asymptotic variance.}
 \usage{
-IE(ygroup, boots = NULL, ps = c("true", "estimated"), scores = NULL,
-  alpha_level = 0.05)
+IE(
+  ygroup,
+  boots = NULL,
+  ps = c("true", "estimated"),
+  scores = NULL,
+  alpha_level = 0.05
+)
 }
 \arguments{
 \item{ygroup}{An matrix including the group average potential outcome

@@ -4,8 +4,14 @@
 \alias{CalcScore}
 \title{Matrix of score for the propensity score.}
 \usage{
-CalcScore(dta, neigh_ind = NULL, phi_hat, cov_cols, trt_name = NULL,
-  integral_bound = 10)
+CalcScore(
+  dta,
+  neigh_ind = NULL,
+  phi_hat,
+  cov_cols,
+  trt_name = NULL,
+  integral_bound = 10
+)
 }
 \arguments{
 \item{dta}{The data set including (at least) the treatment and covaratiates.}

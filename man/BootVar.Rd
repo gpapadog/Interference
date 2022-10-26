@@ -4,10 +4,20 @@
 \alias{BootVar}
 \title{Bootstrap variance of potential outcomes.}
 \usage{
-BootVar(dta, B = 500, alpha, ps = c("true", "est"), cov_cols,
-  phi_hat_true = NULL, ps_info_est = NULL, verbose = TRUE,
-  ps_specs = NULL, trt_col = NULL, out_col = NULL,
-  return_everything = FALSE)
+BootVar(
+  dta,
+  B = 500,
+  alpha,
+  ps = c("true", "est"),
+  cov_cols,
+  phi_hat_true = NULL,
+  ps_info_est = NULL,
+  verbose = TRUE,
+  ps_specs = NULL,
+  trt_col = NULL,
+  out_col = NULL,
+  return_everything = FALSE
+)
 }
 \arguments{
 \item{dta}{The data frame including the observed data set.}

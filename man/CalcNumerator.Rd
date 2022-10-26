@@ -4,7 +4,7 @@
 \alias{CalcNumerator}
 \title{Calculate the numerator in the estimator Yhat.}
 \usage{
-CalcNumerator(Ai_j, Xi_j, gamma_numer, alpha, re_alpha)
+CalcNumerator(Ai_j, Xi_j, gamma_numer, alpha, re_alpha, include_alpha = TRUE)
 }
 \arguments{
 \item{Ai_j}{A vector of length n_i - 1 including the treatment assignment of
@@ -20,6 +20,10 @@ intercept.}
 
 \item{re_alpha}{The fixed effect bi that gives average propensity of
 treatment in the group equal to alpha.}
+
+\item{include_alpha}{If include_alpha is set to true, the probabilities in
+the numerator are divided by the specified value of alpha to stabilize the
+calculation. Defaults to TRUE.}
 }
 \description{
 Calculate the numerator in the estimator Yhat.

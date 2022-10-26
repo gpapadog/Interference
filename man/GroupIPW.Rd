@@ -4,10 +4,21 @@
 \alias{GroupIPW}
 \title{Estimating the group average potential outcome}
 \usage{
-GroupIPW(dta, cov_cols, phi_hat, gamma_numer = NULL, alpha,
-  neigh_ind = NULL, trt_col = NULL, out_col = NULL,
-  alpha_re_bound = 10, integral_bound = 10, keep_re_alpha = FALSE,
-  estimand = c("1", "2"), verbose = TRUE)
+GroupIPW(
+  dta,
+  cov_cols,
+  phi_hat,
+  gamma_numer = NULL,
+  alpha,
+  neigh_ind = NULL,
+  trt_col = NULL,
+  out_col = NULL,
+  alpha_re_bound = 10,
+  integral_bound = 10,
+  keep_re_alpha = FALSE,
+  estimand = c("1", "2"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{dta}{Data frame including treatment, outcome and covariates.}

@@ -5,8 +5,13 @@
 \title{Estimates and asymptotic variance of the population average potential
 outcome for known or estimated propensity score model.}
 \usage{
-Ypop(ygroup, ps = c("true", "estimated"), scores = NULL, dta = NULL,
-  use = "everything")
+Ypop(
+  ygroup,
+  ps = c("true", "estimated"),
+  scores = NULL,
+  dta = NULL,
+  use = "everything"
+)
 }
 \arguments{
 \item{ygroup}{An array including the group average potential outcome

@@ -9,7 +9,12 @@
 #' @param alpha The average probability of treatment among the n_i - 1 units.
 #' @param re_alpha The fixed effect bi that gives average propensity of
 #' treatment in the group equal to alpha.
-CalcNumerator <- function(Ai_j, Xi_j, gamma_numer, alpha, re_alpha) {
+#' @param include_alpha If include_alpha is set to true, the probabilities in
+#' the numerator are divided by the specified value of alpha to stabilize the
+#' calculation. Defaults to TRUE.
+#' 
+CalcNumerator <- function(Ai_j, Xi_j, gamma_numer, alpha, re_alpha,
+                          include_alpha = TRUE) {
   
   gamma_numer <- matrix(gamma_numer, nrow = length(gamma_numer), ncol = 1)
   
@@ -17,6 +22,11 @@ CalcNumerator <- function(Ai_j, Xi_j, gamma_numer, alpha, re_alpha) {
   lin_pred <- lin_pred + re_alpha
   probs <- expit(lin_pred)
   
-  r <- (probs / alpha) ^ Ai_j * ((1 - probs) / (1 - alpha)) ^ (1 - Ai_j)
+  if (include_alpha) {
+    r <- (probs / alpha) ^ Ai_j * ((1 - probs) / (1 - alpha)) ^ (1 - Ai_j)
+  } else {
+    r <- probs ^ Ai_j * (1 - probs) ^ (1 - Ai_j)
+  }
+  
   return(list(prob = prod(r), re_alpha = re_alpha))
 }

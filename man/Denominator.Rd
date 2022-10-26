@@ -4,8 +4,14 @@
 \alias{Denominator}
 \title{Calculating the denominator of the group estimator.}
 \usage{
-Denominator(A, X, phi_hat, alpha = NULL, integral_bound = 10,
-  include_alpha = TRUE)
+Denominator(
+  A,
+  X,
+  phi_hat,
+  alpha = NULL,
+  integral_bound = 10,
+  include_alpha = TRUE
+)
 }
 \arguments{
 \item{A}{The treatment vector for units in the group.}
